@@ -1,54 +1,33 @@
-import { prisma } from "@/database/prisma";
-import { auth } from "../src/lib/auth/server";
-import { Flag, PriorityLevel, TimeSlot } from "@prisma/client";
+// prisma/seed.ts
+import { auth } from "@/lib/auth/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
+const prisma = new PrismaClient();
 
 async function main() {
   console.log("🌱 Starting database seeding...");
 
   // 1. Clean existing data
-  await prisma.dCR_Customer.deleteMany();
-  await prisma.dCR_Slot.deleteMany();
-  await prisma.dCR.deleteMany();
-  await prisma.supportTicket.deleteMany();
-  await prisma.customer.deleteMany();
-  await prisma.centerPersonnel.deleteMany();
+  console.log("🧹 Cleaning existing data...");
+  await prisma.jobApplication.deleteMany();
+  await prisma.jobRequirement.deleteMany();
+  await prisma.job.deleteMany();
+  await prisma.userSkill.deleteMany();
+  await prisma.userProfile.deleteMany();
+  await prisma.category.deleteMany();
   await prisma.verification.deleteMany();
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
-  await prisma.center.deleteMany();
   console.log("✅ Existing data cleaned");
 
-  // 2. Create centers
-  const center1 = await prisma.center.create({
-    data: {
-      centerName: "Healing Minds Center",
-      contactPhone: "9800000001",
-      address: "Thamel, Kathmandu, Nepal",
-    },
-  });
-  const center2 = await prisma.center.create({
-    data: {
-      centerName: "Wellness Hub Center",
-      contactPhone: "9800000002",
-      address: "Patan Dhoka, Lalitpur, Nepal",
-    },
-  });
-  const center3 = await prisma.center.create({
-    data: {
-      centerName: "Mind Care Center",
-      contactPhone: "9800000003",
-      address: "Boudha, Kathmandu, Nepal",
-    },
-  });
-  console.log("✅ Centers created successfully");
-
-  // 3. Create admin
+  // 2. Create admin user
   const adminUser = await auth.api.createUser({
     body: {
-      email: "admin@hone.com",
+      email: "admin@skillmatch.com",
       name: "Admin User",
-      password: "SuperAdmin@123",
+      password: "Admin@123",
       role: "admin",
     },
   });
@@ -59,480 +38,513 @@ async function main() {
       emailVerified: true,
     },
   });
+  console.log("✅ Admin user created");
 
-  // 4. Create center owners
-  const centerOwnerData = [
+  // 3. Create 30+ categories
+  console.log("📁 Creating categories...");
+  const categories = [
     {
-      name: "Rajesh Sharma",
-      email: "rajesh.owner@hone.com",
-      centerId: center1.id,
+      name: "Web Development",
+      slug: "web-development",
+      description: "Frontend and backend web development jobs",
     },
     {
-      name: "Sita Patel",
-      email: "sita.owner@hone.com",
-      centerId: center2.id,
+      name: "Mobile Development",
+      slug: "mobile-development",
+      description: "iOS and Android development",
     },
     {
-      name: "Krishna Karki",
-      email: "krishna.owner@hone.com",
-      centerId: center3.id,
+      name: "Data Science",
+      slug: "data-science",
+      description: "Data analysis and machine learning",
+    },
+    {
+      name: "DevOps",
+      slug: "devops",
+      description: "Infrastructure and deployment",
+    },
+    {
+      name: "UI/UX Design",
+      slug: "ui-ux-design",
+      description: "User interface and experience design",
+    },
+    {
+      name: "Database Administration",
+      slug: "database-admin",
+      description: "Database management and optimization",
+    },
+    {
+      name: "Cloud Computing",
+      slug: "cloud-computing",
+      description: "AWS, Azure, GCP services",
+    },
+    {
+      name: "Cybersecurity",
+      slug: "cybersecurity",
+      description: "Security and ethical hacking",
+    },
+    {
+      name: "Quality Assurance",
+      slug: "quality-assurance",
+      description: "Testing and QA roles",
+    },
+    {
+      name: "Project Management",
+      slug: "project-management",
+      description: "Technical project management",
+    },
+    {
+      name: "Backend Development",
+      slug: "backend-development",
+      description: "Server-side development",
+    },
+    {
+      name: "Frontend Development",
+      slug: "frontend-development",
+      description: "Client-side development",
+    },
+    {
+      name: "Full Stack Development",
+      slug: "full-stack-development",
+      description: "End-to-end development",
+    },
+    {
+      name: "Machine Learning",
+      slug: "machine-learning",
+      description: "AI and ML engineering",
+    },
+    {
+      name: "Blockchain",
+      slug: "blockchain",
+      description: "Blockchain and cryptocurrency",
+    },
+    {
+      name: "Game Development",
+      slug: "game-development",
+      description: "Video game development",
+    },
+    {
+      name: "Embedded Systems",
+      slug: "embedded-systems",
+      description: "IoT and embedded programming",
+    },
+    {
+      name: "Network Engineering",
+      slug: "network-engineering",
+      description: "Network infrastructure",
+    },
+    {
+      name: "Technical Writing",
+      slug: "technical-writing",
+      description: "Documentation and content",
+    },
+    {
+      name: "Business Intelligence",
+      slug: "business-intelligence",
+      description: "BI and analytics",
+    },
+    {
+      name: "System Administration",
+      slug: "system-administration",
+      description: "Server and system management",
+    },
+    {
+      name: "Software Architecture",
+      slug: "software-architecture",
+      description: "System design and architecture",
+    },
+    {
+      name: "API Development",
+      slug: "api-development",
+      description: "RESTful and GraphQL APIs",
+    },
+    {
+      name: "E-commerce",
+      slug: "e-commerce",
+      description: "Online shopping platforms",
+    },
+    {
+      name: "CRM Development",
+      slug: "crm-development",
+      description: "Customer relationship management",
+    },
+    {
+      name: "ERP Systems",
+      slug: "erp-systems",
+      description: "Enterprise resource planning",
+    },
+    {
+      name: "Salesforce",
+      slug: "salesforce",
+      description: "Salesforce development and admin",
+    },
+    {
+      name: "WordPress Development",
+      slug: "wordpress-development",
+      description: "WordPress themes and plugins",
+    },
+    {
+      name: "Digital Marketing Tech",
+      slug: "digital-marketing-tech",
+      description: "Marketing automation and tools",
+    },
+    {
+      name: "AR/VR Development",
+      slug: "ar-vr-development",
+      description: "Augmented and virtual reality",
     },
   ];
 
-  const centerOwners = [];
-  for (const ownerData of centerOwnerData) {
-    const ownerUser = await auth.api.createUser({
-      body: {
-        name: ownerData.name,
-        email: ownerData.email,
-        password: "Owner@123",
-        role: "centerOwner",
-      },
-    });
+  const createdCategories = [];
+  for (const cat of categories) {
+    const category = await prisma.category.create({ data: cat });
+    createdCategories.push(category);
+  }
+  console.log(`✅ ${createdCategories.length} categories created`);
 
-    await prisma.user.update({
-      where: {
-        id: ownerUser.user.id,
-      },
+  // 4. Create 30+ regular users with profiles
+  console.log("👥 Creating users with profiles...");
+  const skills = [
+    "JavaScript",
+    "TypeScript",
+    "React",
+    "Node.js",
+    "Python",
+    "Java",
+    "C++",
+    "Angular",
+    "Vue.js",
+    "Express.js",
+    "Django",
+    "Flask",
+    "Spring Boot",
+    "SQL",
+    "MongoDB",
+    "PostgreSQL",
+    "MySQL",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Git",
+    "HTML",
+    "CSS",
+    "Tailwind",
+    "Bootstrap",
+    "REST API",
+    "GraphQL",
+    "Next.js",
+    "Nest.js",
+    "FastAPI",
+    "Ruby on Rails",
+    "PHP",
+    "Laravel",
+    "Machine Learning",
+    "Data Science",
+    "TensorFlow",
+    "PyTorch",
+    "Pandas",
+    "NumPy",
+    "UI/UX Design",
+    "Figma",
+    "Adobe XD",
+    "Photoshop",
+    "Testing",
+    "Jest",
+    "Cypress",
+    "Selenium",
+    "CI/CD",
+    "Jenkins",
+  ];
+
+  const locations = [
+    "Kathmandu",
+    "Pokhara",
+    "Lalitpur",
+    "Biratnagar",
+    "Bhaktapur",
+    "Dharan",
+    "Butwal",
+    "Hetauda",
+    "Janakpur",
+    "Nepalgunj",
+  ];
+
+  const users = [];
+  for (let i = 1; i <= 30; i++) {
+    const userPassword = await bcrypt.hash("User@123", 10);
+    const numSkills = Math.floor(Math.random() * 8) + 5;
+    const selectedSkills: string[] = [];
+
+    while (selectedSkills.length < numSkills) {
+      const skill = skills[Math.floor(Math.random() * skills.length)];
+      if (!selectedSkills.find((s) => s === skill)) {
+        selectedSkills.push(skill);
+      }
+    }
+
+    const user = await prisma.user.create({
       data: {
+        name: `User ${i}`,
+        email: `user${i}@example.com`,
         emailVerified: true,
-      },
-    });
-
-    await prisma.centerPersonnel.create({
-      data: { userId: ownerUser.user.id, centerId: ownerData.centerId },
-    });
-
-    centerOwners.push({ ...ownerUser.user, centerId: ownerData.centerId });
-  }
-
-  // 5. Create teachers
-  const teacherData = [
-    {
-      name: "Dr. Priya Thapa",
-      email: "priya.teacher@hone.com",
-      centerId: center1.id,
-    },
-    {
-      name: "Amit Gurung",
-      email: "amit.teacher@hone.com",
-      centerId: center1.id,
-    },
-    {
-      name: "Dr. Sunita Rai",
-      email: "sunita.teacher@hone.com",
-      centerId: center2.id,
-    },
-    {
-      name: "Binod Shrestha",
-      email: "binod.teacher@hone.com",
-      centerId: center2.id,
-    },
-    {
-      name: "Maya Tamang",
-      email: "maya.teacher@hone.com",
-      centerId: center3.id,
-    },
-    {
-      name: "Deepak Rana",
-      email: "deepak.teacher@hone.com",
-      centerId: center3.id,
-    },
-  ];
-
-  const teachers = [];
-  for (const teacher of teacherData) {
-    const teacherUser = await auth.api.createUser({
-      body: {
-        name: teacher.name,
-        email: teacher.email,
-        password: "Teacher@123",
-        role: "teacher",
-      },
-    });
-
-    await prisma.user.update({
-      where: { id: teacherUser.user.id },
-      data: { emailVerified: true },
-    });
-
-    const personnel = await prisma.centerPersonnel.create({
-      data: { userId: teacherUser.user.id, centerId: teacher.centerId },
-    });
-
-    teachers.push({
-      ...teacherUser.user,
-      centerId: teacher.centerId,
-      personnelId: personnel.id,
-    });
-  }
-  console.log("✅ Teacher users created successfully");
-
-  // 6. Create customers
-  const customerData = [
-    {
-      name: "Ram Bahadur",
-      email: "ram.customer@gmail.com",
-      address: "Baneshwor, Kathmandu",
-      age: 25,
-      contactNumber: "9841000001",
-      centerId: center1.id,
-    },
-    {
-      name: "Gita Devi",
-      email: "gita.customer@gmail.com",
-      address: "Jawalakhel, Lalitpur",
-      age: 32,
-      contactNumber: "9841000002",
-      centerId: center2.id,
-    },
-    {
-      name: "Krishna Magar",
-      email: "krishna.customer@gmail.com",
-      address: "Balaju, Kathmandu",
-      age: 28,
-      contactNumber: "9841000003",
-      centerId: center1.id,
-    },
-    {
-      name: "Sarita Adhikari",
-      email: "sarita.customer@gmail.com",
-      address: "Bhaktapur Durbar Square",
-      age: 35,
-      contactNumber: "9841000004",
-      centerId: center3.id,
-    },
-    {
-      name: "Dipesh Lama",
-      email: "dipesh.customer@gmail.com",
-      address: "Kirtipur, Kathmandu",
-      age: 24,
-      contactNumber: "9841000005",
-      centerId: center2.id,
-    },
-    {
-      name: "Anita Shrestha",
-      email: "anita.customer@gmail.com",
-      address: "New Road, Kathmandu",
-      age: 29,
-      contactNumber: "9841000006",
-      centerId: center1.id,
-    },
-    {
-      name: "Bijay Tamang",
-      email: "bijay.customer@gmail.com",
-      address: "Sankhamul, Kathmandu",
-      age: 31,
-      contactNumber: "9841000007",
-      centerId: center3.id,
-    },
-    {
-      name: "Kopila Thapa",
-      email: "kopila.customer@gmail.com",
-      address: "Gongabu, Kathmandu",
-      age: 27,
-      contactNumber: "9841000008",
-      centerId: center2.id,
-    },
-    {
-      name: "Sandip Bhandari",
-      email: "sandip.customer@gmail.com",
-      address: "Lazimpat, Kathmandu",
-      age: 30,
-      contactNumber: "9841000009",
-      centerId: center1.id,
-    },
-    {
-      name: "Rachana Koju",
-      email: "rachana.customer@gmail.com",
-      address: "Patan, Lalitpur",
-      age: 26,
-      contactNumber: "9841000010",
-      centerId: center2.id,
-    },
-  ];
-
-  const customers = [];
-  for (let i = 0; i < customerData.length; i++) {
-    const data = customerData[i];
-
-    const customerUser = await prisma.user.create({
-      data: {
-        name: data.name,
-        email: data.email,
-        emailVerified: false,
-        role: "customer",
-      },
-    });
-
-    const customer = await prisma.customer.create({
-      data: {
-        userId: customerUser.id,
-        centerId: data.centerId,
-        address: data.address,
-        age: data.age,
-        contactNumber: data.contactNumber,
-        isInteresting: i % 3 === 0,
-      },
-    });
-
-    customers.push(customer);
-  }
-  console.log("✅ Customer users created successfully");
-
-  // 7. Get all center personnel for DCR slots
-  const allPersonnel = await prisma.centerPersonnel.findMany({
-    include: { user: true },
-  });
-  console.log(
-    `📋 Found ${allPersonnel.length} center personnel for assignments`
-  );
-
-  // 8. Create DCRs (100 entries)
-  console.log("📅 Creating DCRs...");
-  const createdDCRs = [];
-  const centers = [center1, center2, center3];
-
-  for (let i = 0; i < 100; i++) {
-    const center = centers[i % centers.length];
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    date.setHours(0, 0, 0, 0);
-
-    const dcr = await prisma.dCR.create({
-      data: {
-        centerId: center.id,
-        date,
-        weather:
-          ["Sunny", "Cloudy", "Rainy", "Windy"][i % 4] + " with clear skies",
-        morningMeeting: `Morning briefing for ${center.centerName} on day ${i}`,
-        eveningMeeting: `Evening review for ${center.centerName} on day ${i}`,
-        rumor:
-          i % 5 === 0 ? `Potential expansion discussion on day ${i}` : null,
-        returned: Math.floor(Math.random() * 5),
-        bsCall: Math.floor(Math.random() * 10),
-      },
-    });
-
-    createdDCRs.push(dcr);
-  }
-  console.log("✅ 100 DCRs created successfully");
-
-  // 9. Create DCR Slots (100 per DCR with proper teacher assignment)
-  console.log("⏰ Creating DCR slots...");
-  const slotTimes = Object.values(TimeSlot);
-  const topics = [
-    "Individual Therapy",
-    "Group Therapy",
-    "Meditation",
-    "CBT",
-    "Family Counseling",
-    "Stress Management",
-    "Anxiety Support",
-    "Depression Recovery",
-    "Art Therapy",
-    "Music Therapy",
-  ];
-
-  let totalSlots = 0;
-  for (const dcr of createdDCRs) {
-    const centerPersonnel = allPersonnel.filter(
-      (p) => p.centerId === dcr.centerId
-    );
-
-    if (centerPersonnel.length === 0) {
-      console.warn(`⚠️  No personnel found for center ${dcr.centerId}`);
-      continue;
-    }
-
-    for (let i = 0; i < 100; i++) {
-      const personnel = centerPersonnel[i % centerPersonnel.length];
-      const slot = slotTimes[i % slotTimes.length];
-      const topic = topics[i % topics.length];
-
-      await prisma.dCR_Slot.create({
-        data: {
-          dcrId: dcr.id,
-          timeSlot: slot,
-          waiting: Math.floor(Math.random() * 8) + 1,
-          inTherapy: Math.floor(Math.random() * 6) + 1,
-          booking: Math.floor(Math.random() * 10) + 2,
-          topic,
-          teacherId: personnel.id,
-          newCustomers: Math.floor(Math.random() * 4),
-          couples: Math.floor(Math.random() * 3),
-          tenDays: Math.floor(Math.random() * 5) + 1,
-          afterEvent: Math.floor(Math.random() * 3),
+        role: "user",
+        accounts: {
+          create: {
+            id: `user-${i}-account`,
+            accountId: `user-${i}-account-id`,
+            providerId: "credential",
+            password: userPassword,
+          },
         },
-      });
-      totalSlots++;
-    }
+        profile: {
+          create: {
+            phone: `98${Math.floor(10000000 + Math.random() * 90000000)}`,
+            location: locations[Math.floor(Math.random() * locations.length)],
+            bio: `Passionate developer with ${
+              Math.floor(Math.random() * 8) + 1
+            } years of experience in software development. Strong problem-solving skills and team collaboration.`,
+            experience: `${
+              Math.floor(Math.random() * 8) + 1
+            } years in software development`,
+            education: `Bachelor's in Computer Science`,
+            cvUrl: `/uploads/cv/user${i}.pdf`,
+            cvParsedAt: new Date(),
+            skills: {
+              create: selectedSkills.map((skill) => {
+                const levels = ["beginner", "intermediate", "expert"];
+                return {
+                  skillName: skill,
+                  level: levels[Math.floor(Math.random() * levels.length)],
+                };
+              }),
+            },
+          },
+        },
+      },
+      include: {
+        profile: {
+          include: {
+            skills: true,
+          },
+        },
+      },
+    });
+    users.push(user);
   }
-  console.log(`✅ ${totalSlots} DCR slots created successfully`);
+  console.log(`✅ ${users.length} users created with profiles and skills`);
 
-  // 10. Create support tickets with varied dates
-  console.log("🎫 Creating support tickets...");
-  const initialRemarks = [
-    "Initial consultation completed. Patient shows good engagement.",
-    "Good progress observed in recent sessions. Continue current approach.",
-    "Missed last appointment. Need to follow up urgently.",
-    "Family session recommended for better support system.",
-    "Medication adjustment needed. Consult with psychiatrist.",
-    "Group therapy recommended for social anxiety management.",
-    "Patient responding well to CBT techniques.",
-    "Need to address work-related stress in next session.",
-    "Positive improvement in sleep patterns reported.",
-    "Requires additional sessions for trauma processing.",
+  // 5. Create 50+ jobs
+  console.log("💼 Creating jobs...");
+  const companies = [
+    "Tech Innovations Pvt. Ltd.",
+    "Digital Solutions Nepal",
+    "CloudNet Systems",
+    "DataMinds Corp",
+    "WebCraft Studios",
+    "NextGen Technologies",
+    "Cyber Secure Nepal",
+    "AI Ventures",
+    "CodeFactory",
+    "Smart Solutions",
+    "Future Tech",
+    "InnovateLab",
+    "TechHub Nepal",
+    "Digital Dynamics",
+    "ByteBuilders",
+    "AppMakers Nepal",
+    "CloudFirst",
+    "DataDriven Co.",
+    "SecurityPlus",
+    "DesignStudio Nepal",
   ];
 
-  const additionalRemarks = [
-    "Follow-up call completed. Patient confirmed next appointment.",
-    "Discussed treatment goals and progress milestones.",
-    "Patient reported improvement in symptoms.",
-    "Scheduling conflict resolved. New appointment set.",
-    "Emergency session conducted due to crisis situation.",
+  const jobTypes = ["full-time", "part-time", "contract", "internship"];
+
+  const jobTitles = [
+    "Frontend Developer",
+    "Backend Developer",
+    "Full Stack Developer",
+    "React Developer",
+    "Node.js Developer",
+    "Python Developer",
+    "Java Developer",
+    "DevOps Engineer",
+    "Data Scientist",
+    "Machine Learning Engineer",
+    "UI/UX Designer",
+    "Mobile Developer",
+    "Database Administrator",
+    "Cloud Architect",
+    "Security Engineer",
+    "QA Engineer",
+    "Project Manager",
+    "Software Architect",
+    "API Developer",
+    "WordPress Developer",
+    "Angular Developer",
+    "Vue.js Developer",
+    "Django Developer",
+    "PHP Developer",
+    "iOS Developer",
+    "Android Developer",
+    "Game Developer",
+    "Blockchain Developer",
+    "AI Engineer",
+    "Network Engineer",
+    "System Administrator",
+    "Technical Writer",
+    "BI Analyst",
+    "Embedded Systems Engineer",
+    "Salesforce Developer",
+    "CRM Developer",
+    "ERP Specialist",
+    "AR/VR Developer",
+    "E-commerce Developer",
+    "Marketing Tech Specialist",
+    "Flutter Developer",
+    "React Native Developer",
+    "Kubernetes Engineer",
+    "ETL Developer",
+    "Data Engineer",
+    "Site Reliability Engineer",
+    "Platform Engineer",
+    "Solutions Architect",
+    "Integration Specialist",
+    "Automation Engineer",
+    "Performance Engineer",
   ];
 
-  const priorities = [
-    PriorityLevel.HIGH,
-    PriorityLevel.MEDIUM,
-    PriorityLevel.LOW,
-  ];
+  const jobs = [];
+  for (let i = 0; i < 50; i++) {
+    const category =
+      createdCategories[Math.floor(Math.random() * createdCategories.length)];
+    const jobTitle = jobTitles[i % jobTitles.length];
 
-  let totalTickets = 0;
-  for (let i = 0; i < customers.length; i++) {
-    const customer = customers[i];
+    const numRequirements = Math.floor(Math.random() * 5) + 3;
+    const selectedSkills: string[] = [];
+    while (selectedSkills.length < numRequirements) {
+      const skill = skills[Math.floor(Math.random() * skills.length)];
+      if (!selectedSkills.includes(skill)) {
+        selectedSkills.push(skill);
+      }
+    }
 
-    const ticketCount = Math.floor(Math.random() * 3) + 1;
+    const job = await prisma.job.create({
+      data: {
+        title: jobTitle,
+        description: `We are looking for an experienced ${jobTitle} to join our dynamic team. You will work on cutting-edge projects, collaborate with talented professionals, and have opportunities for growth and learning.`,
+        company: companies[Math.floor(Math.random() * companies.length)],
+        location: locations[Math.floor(Math.random() * locations.length)],
+        salary: `Rs. ${Math.floor(Math.random() * 100000) + 30000} - ${
+          Math.floor(Math.random() * 150000) + 80000
+        }`,
+        jobType: jobTypes[Math.floor(Math.random() * jobTypes.length)],
+        categoryId: category.id,
+        postedById: adminUser.user.id,
+        isActive: Math.random() > 0.1,
+        expiresAt: new Date(
+          Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000
+        ),
+        requirements: {
+          create: selectedSkills.map((skill, index) => ({
+            skillName: skill,
+            required: index < Math.floor(numRequirements / 2),
+          })),
+        },
+      },
+      include: {
+        requirements: true,
+      },
+    });
+    jobs.push(job);
+  }
+  console.log(`✅ ${jobs.length} jobs created with requirements`);
 
-    for (let j = 0; j < ticketCount; j++) {
-      const isResolved = Math.random() > 0.6;
-      const hasFollowUp = !isResolved && Math.random() > 0.3;
+  // 6. Create job applications with match scores
+  console.log("📝 Creating job applications...");
+  let totalApplications = 0;
 
-      const followUpDate = hasFollowUp ? new Date() : null;
-      if (followUpDate) {
-        const isOverdue = Math.random() > 0.7;
-        if (isOverdue) {
-          followUpDate.setDate(
-            followUpDate.getDate() - Math.floor(Math.random() * 7) - 1
-          );
-        } else {
-          followUpDate.setDate(
-            followUpDate.getDate() + Math.floor(Math.random() * 21) + 1
-          );
+  for (const user of users.slice(0, 25)) {
+    const numApplications = Math.floor(Math.random() * 5) + 2;
+    const appliedJobs = new Set();
+
+    for (let i = 0; i < numApplications; i++) {
+      let job;
+      do {
+        job = jobs[Math.floor(Math.random() * jobs.length)];
+      } while (appliedJobs.has(job.id));
+
+      appliedJobs.add(job.id);
+
+      const userSkillNames =
+        user.profile?.skills.map((s) => s.skillName.toLowerCase()) || [];
+      const jobRequirements = job.requirements;
+
+      let totalWeight = 0;
+      let matchedWeight = 0;
+
+      jobRequirements.forEach((req) => {
+        const weight = req.required ? 2 : 1;
+        totalWeight += weight;
+
+        if (userSkillNames.includes(req.skillName.toLowerCase())) {
+          matchedWeight += weight;
         }
-        followUpDate.setHours(0, 0, 0, 0);
-      }
+      });
 
-      const remarksArray: string[] = [
-        initialRemarks[(i + j) % initialRemarks.length],
-      ];
+      const matchScore =
+        totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 0;
 
-      const additionalRemarksCount = Math.floor(Math.random() * 3);
-      for (let k = 0; k < additionalRemarksCount; k++) {
-        remarksArray.push(
-          additionalRemarks[(i + j + k) % additionalRemarks.length]
-        );
-      }
-
-      const resolvedDate = isResolved ? new Date() : null;
-      if (resolvedDate) {
-        resolvedDate.setDate(
-          resolvedDate.getDate() - Math.floor(Math.random() * 14)
-        );
-        resolvedDate.setHours(0, 0, 0, 0);
-      }
-
-      await prisma.supportTicket.create({
+      const statuses = ["pending", "reviewed", "accepted", "rejected"];
+      await prisma.jobApplication.create({
         data: {
-          customerId: customer.id,
-          initialRemark: initialRemarks[(i + j) % initialRemarks.length],
-          followUpAt: followUpDate,
-          priority: priorities[(i + j) % priorities.length],
-          remarks: remarksArray,
-          resolvedAt: resolvedDate,
-          resolvedMessage: isResolved
-            ? `Issue resolved through ${
-                j + 3
-              } counseling sessions. Patient shows significant improvement.`
-            : null,
+          jobId: job.id,
+          userId: user.id,
+          matchScore: Math.round(matchScore * 100) / 100,
+          status: statuses[Math.floor(Math.random() * statuses.length)],
+          coverLetter: `I am very interested in the ${job.title} position at ${job.company}. With my experience and skills, I believe I would be a great fit for your team.`,
         },
       });
-      totalTickets++;
+      totalApplications++;
     }
   }
-  console.log(`✅ ${totalTickets} support tickets created successfully`);
+  console.log(`✅ ${totalApplications} job applications created`);
 
-  // 11. Create flagged DCR customers
-  console.log("🚩 Creating flagged DCR customers...");
-  let flaggedCount = 0;
-  for (let i = 0; i < Math.min(50, createdDCRs.length); i++) {
-    const dcr = createdDCRs[i];
-    const customer = customers[i % customers.length];
-
-    await prisma.dCR_Customer.create({
-      data: {
-        dcrId: dcr.id,
-        customerId: customer.id,
-        flag: i % 2 === 0 ? Flag.INTERESTING : Flag.TESTIMONIAL,
-        message:
-          i % 2 === 0
-            ? "Customer showed exceptional progress in therapy."
-            : "Willing to provide testimonial for our services.",
-      },
-    });
-    flaggedCount++;
-  }
-  console.log(`✅ ${flaggedCount} flagged customers created`);
-
-  // 12. Verify final results
+  // 7. Verify final results
   console.log("\n🔍 Verifying results...");
   const finalUserCount = await prisma.user.count();
   const adminCount = await prisma.user.count({ where: { role: "admin" } });
-  const ownerCount = await prisma.user.count({
-    where: { role: "centerOwner" },
-  });
-  const teacherCount = await prisma.user.count({
-    where: { role: "teacher" },
-  });
-  const customerCount = await prisma.user.count({
-    where: { role: "customer" },
-  });
-  const dcrCount = await prisma.dCR.count();
-  const slotCount = await prisma.dCR_Slot.count();
-  const supportTicketCount = await prisma.supportTicket.count();
-  const flaggedCustomerCount = await prisma.dCR_Customer.count();
+  const regularUserCount = await prisma.user.count({ where: { role: "user" } });
+  const categoryCount = await prisma.category.count();
+  const jobCount = await prisma.job.count();
+  const activeJobCount = await prisma.job.count({ where: { isActive: true } });
+  const userProfileCount = await prisma.userProfile.count();
+  const userSkillCount = await prisma.userSkill.count();
+  const jobRequirementCount = await prisma.jobRequirement.count();
+  const applicationCount = await prisma.jobApplication.count();
 
   console.log("\n🎉 Database seeding completed successfully!");
   console.log("\n📋 Summary:");
-  console.log(`- Centers: 3`);
   console.log(`- Total Users: ${finalUserCount}`);
   console.log(`  - Admin Users: ${adminCount}`);
-  console.log(`  - Center Owners: ${ownerCount}`);
-  console.log(`  - Teachers: ${teacherCount}`);
-  console.log(`  - Customers: ${customerCount}`);
-  console.log(`- DCRs: ${dcrCount}`);
-  console.log(`- DCR Slots: ${slotCount}`);
-  console.log(`- Support Tickets: ${supportTicketCount}`);
-  console.log(`- Flagged Customers: ${flaggedCustomerCount}`);
+  console.log(`  - Regular Users: ${regularUserCount}`);
+  console.log(`- Categories: ${categoryCount}`);
+  console.log(`- Jobs: ${jobCount} (${activeJobCount} active)`);
+  console.log(`- User Profiles: ${userProfileCount}`);
+  console.log(`- User Skills: ${userSkillCount}`);
+  console.log(`- Job Requirements: ${jobRequirementCount}`);
+  console.log(`- Job Applications: ${applicationCount}`);
 
-  console.log("\n🔑 Login Credentials (Ready to use!):");
-  console.log("👑 Admin: admin@hone.com / SuperAdmin@123");
-  console.log("🏢 Center Owner 1: rajesh.owner@hone.com / Owner@123");
-  console.log("🏢 Center Owner 2: sita.owner@hone.com / Owner@123");
-  console.log("🏢 Center Owner 3: krishna.owner@hone.com / Owner@123");
-  console.log("👨‍🏫 Teacher 1: priya.teacher@hone.com / Teacher@123");
-  console.log("👨‍🏫 Teacher 2: amit.teacher@hone.com / Teacher@123");
-  console.log("👨‍🏫 Teacher 3: sunita.teacher@hone.com / Teacher@123");
-  console.log("👨‍🏫 Teacher 4: binod.teacher@hone.com / Teacher@123");
-  console.log("👨‍🏫 Teacher 5: maya.teacher@hone.com / Teacher@123");
-  console.log("👨‍🏫 Teacher 6: deepak.teacher@hone.com / Teacher@123");
-  console.log(
-    "\n📝 Note: Customer accounts are created in the database but need to sign up through the app to set passwords."
-  );
-  console.log(
-    "✅ All staff users can sign in immediately with these credentials!"
-  );
+  console.log("\n🔑 Login Credentials:");
+  console.log("👑 Admin: admin@jobportal.com / Admin@123");
+  console.log("👤 User 1: user1@example.com / User@123");
+  console.log("👤 User 2: user2@example.com / User@123");
+  console.log("👤 User 3: user3@example.com / User@123");
+  console.log("... (user1 to user30 all use password: User@123)");
+  console.log("\n✅ All users can sign in immediately with these credentials!");
 }
 
 main()

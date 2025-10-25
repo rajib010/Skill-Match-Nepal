@@ -7,11 +7,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
   id            String    @id @default(cuid())
   name          String
-  email         String?   @unique
+  email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
   createdAt     DateTime  @default(now())
@@ -19,13 +18,134 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  role       String    @default("customer")
+  role       String    @default("user")
   banned     Boolean   @default(false)
   banReason  String?
   banExpires DateTime?
 
+  // User profile relations
+  profile      UserProfile?
+  applications JobApplication[]
+
   @@index([name, email])
   @@map("user")
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  phone       String?
+  location    String?
+  bio         String?  @db.Text
+  experience  String?  @db.Text
+  education   String?  @db.Text
+  
+  // CV related
+  cvUrl       String?
+  cvParsedAt  DateTime?
+  
+  skills      UserSkill[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("user_profile")
+}
+
+model UserSkill {
+  id        String      @id @default(cuid())
+  profileId String
+  profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  
+  skillName String
+  level     String?     // beginner, intermediate, expert
+  
+  createdAt DateTime    @default(now())
+
+  @@unique([profileId, skillName])
+  @@index([skillName])
+  @@map("user_skill")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  slug        String   @unique
+  
+  jobs        Job[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("category")
+}
+
+model Job {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  company     String
+  location    String
+  salary      String?
+  jobType     String   // full-time, part-time, contract, internship
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  postedById  String   // admin user id
+  
+  isActive    Boolean  @default(true)
+  expiresAt   DateTime?
+  
+  requirements JobRequirement[]
+  applications JobApplication[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([categoryId, isActive])
+  @@index([postedById])
+  @@map("job")
+}
+
+model JobRequirement {
+  id         String   @id @default(cuid())
+  jobId      String
+  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  skillName  String
+  required   Boolean  @default(true) // required vs preferred
+  
+  createdAt  DateTime @default(now())
+
+  @@unique([jobId, skillName])
+  @@index([skillName])
+  @@map("job_requirement")
+}
+
+model JobApplication {
+  id        String   @id @default(cuid())
+  jobId     String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  matchScore Float    // 0-100 score from keyword matching
+  status     String   @default("pending") // pending, reviewed, accepted, rejected
+  
+  coverLetter String? @db.Text
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([jobId, userId])
+  @@index([userId, status])
+  @@index([jobId, matchScore])
+  @@map("job_application")
 }
 
 model Session {
