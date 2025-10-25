@@ -9,9 +9,10 @@ interface UserImageProps {
 }
 
 export default function UserImage({ src, className }: UserImageProps) {
+  const imageUrl = src ?? "/logo.jpg"
   return (
     <Avatar className={`size-10 ${className}`}>
-      <AvatarImage src={constructUrl(src!)} />
+      <AvatarImage src={constructUrl(imageUrl)} />
       <AvatarFallback>UC</AvatarFallback>
     </Avatar>
   );

@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "./dashboard.css";
+import { headers } from "next/headers";
 
 export default async function AuthenticatedLayout({
   children,
@@ -14,7 +15,7 @@ export default async function AuthenticatedLayout({
     redirect("/login");
   }
 
-  const userData = await getSignedInUser();
+const userData = await getSignedInUser(await headers());
 
   const user: User = {
     ...userData,

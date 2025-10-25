@@ -22,14 +22,24 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useState } from "react";
+import { useState, memo } from "react";
 import { AlertModal } from "@/app/(authenticated)/dashboard/_components/AlertModal";
 import { signOut } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 
-export function NavUser({ user }: { user: User }) {
+function getInitials(fullName: string) {
+  if (!fullName) return "";
+
+  const words = fullName.trim().split(/\s+/);
+  if (words.length < 2) return words[0][0]?.toUpperCase() || "";
+
+  const [first, second] = words;
+  return (first[0] + second[0]).toUpperCase();
+}
+
+export const NavUser = memo(function NavUser({ user }: { user: User }) {
   const { isMobile } = useSidebar();
-  const avatarSrc = user.image ?? "/default-avatar.png";
+  const avatarSrc = user.image ?? "/logo.jpg";
   const [showLogout, setShowLogout] = useState(false);
   const router = useRouter();
 
@@ -45,7 +55,9 @@ export function NavUser({ user }: { user: User }) {
               >
                 <Avatar className="h-8 w-8 rounded-lg grayscale">
                   <AvatarImage src={avatarSrc} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(user.name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -66,7 +78,9 @@ export function NavUser({ user }: { user: User }) {
                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage src={avatarSrc} alt={user.name} />
-                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                    <AvatarFallback className="rounded-lg">
+                      {getInitials(user.name)}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate font-medium">{user.name}</span>
@@ -86,7 +100,7 @@ export function NavUser({ user }: { user: User }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={(e) => {
-                  e.preventDefault(); 
+                  e.preventDefault();
                   setShowLogout(true);
                 }}
               >
@@ -111,4 +125,4 @@ export function NavUser({ user }: { user: User }) {
       />
     </>
   );
-}
+});
