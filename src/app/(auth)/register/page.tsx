@@ -109,6 +109,7 @@ export default function RegisterPage() {
                       <div className="relative">
                         <Input
                           id="password"
+                          name="password"
                           type={showPassword ? "text" : "password"}
                           required
                         />
@@ -135,6 +136,7 @@ export default function RegisterPage() {
                       <div className="relative">
                         <Input
                           id="confirm-password"
+                          name="confirm-password"
                           type={showConfirmPassword ? "text" : "password"}
                           required
                         />

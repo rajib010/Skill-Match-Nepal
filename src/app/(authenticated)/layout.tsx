@@ -3,18 +3,24 @@ import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import "./dashboard.css"
+import "./dashboard.css";
 
 export default async function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // if (!(await isAuthenticated())) {
-  //   redirect("/login");
-  // }
+  if (!(await isAuthenticated())) {
+    redirect("/login");
+  }
 
-  // const user = await getSignedInUser();
+  const userData = await getSignedInUser();
+
+  const user: User = {
+    ...userData,
+    image: userData.image ?? undefined,
+    role: (userData.role ?? "user") as "user" | "admin",
+  };
 
   return (
     <SidebarProvider
@@ -25,7 +31,7 @@ export default async function AuthenticatedLayout({
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset"  />
+      <AppSidebar variant="inset" user={user} />
       <SidebarInset>
         <SiteHeader />
         <div className="p-4 min-h-screen">{children}</div>

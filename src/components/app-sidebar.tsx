@@ -2,63 +2,61 @@
 
 import * as React from "react";
 import {
-  IconAnalyze,
-  IconChalkboardTeacher,
-  IconDeviceLaptop,
-  IconSettings,
-  IconUserBitcoin,
+  IconChartBar,
+  IconDashboard,
+  IconFolder,
+  IconInnerShadowTop,
+  IconListDetails,
+  IconUsers,
 } from "@tabler/icons-react";
 import { NavMain } from "@/components/nav-main";
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import Link from "next/link";
-import { SignedInUser } from "@/lib/auth/server";
-import logo from "../../public/logo.jpg";
-import Image from "next/image";
+import { NavUser } from "./nav-user";
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: User
+}
+
 
 const data = {
   navMain: [
     {
-      title: "Jobs",
-      url: "/dashboard/jobs",
-      icon: IconDeviceLaptop,
+      title: "Dashboard",
+      url: "#",
+      icon: IconDashboard,
     },
     {
-      title: "Users",
-      url: "/dashboard/users",
-      icon: IconUserBitcoin,
+      title: "Lifecycle",
+      url: "#",
+      icon: IconListDetails,
     },
     {
       title: "Analytics",
-      url: "/dashboard/follow-up",
-      icon: IconAnalyze,
-    },
-
-  ],
-  navPreferences: [
-    {
-      title: "Settings",
-      url: "/dashboard/account",
-      icon: IconSettings,
+      url: "#",
+      icon: IconChartBar,
     },
     {
-      title: "Logout",
-      url: "",
+      title: "Projects",
+      url: "#",
+      icon: IconFolder,
+    },
+    {
+      title: "Team",
+      url: "#",
+      icon: IconUsers,
     },
   ],
 };
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
-  user?: SignedInUser;
-};
-
-export function AppSidebar({ ...props }: AppSidebarProps) {
+export function AppSidebar({ user, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -66,29 +64,22 @@ export function AppSidebar({ ...props }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="flex h-[var(--header-height)] items-center justify-center px-4"
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link href="/dashboard">
-                <Image
-                  src={logo}
-                  alt="H-One logo"
-                  className="max-h-[calc(var(--header-height)-1rem)] w-auto"
-                />
-              </Link>
+              <a href="#">
+                <IconInnerShadowTop className="!size-5" />
+                <span className="text-base font-semibold">Acme Inc.</span>
+              </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <div>
-          <span className="sidebar-header-text">MAIN MENU</span>
-          <NavMain items={data.navMain} />
-        </div>
-        <div>
-          <span className="sidebar-header-text">PREFERENCES</span>
-          <NavMain items={data.navPreferences} />
-        </div>
+        <NavMain items={data.navMain} />
       </SidebarContent>
+      <SidebarFooter>
+        <NavUser user={user} />
+      </SidebarFooter>
     </Sidebar>
   );
 }
