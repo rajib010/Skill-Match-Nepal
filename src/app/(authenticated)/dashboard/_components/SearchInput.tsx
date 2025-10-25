@@ -15,7 +15,7 @@ function SearchInput({ defaultValue }: SearchInputProps) {
   const [searchTerm, setSearchTerm] = useState(
     searchParams.get("search") || defaultValue || ""
   );
-  const isFirstRender = useRef(true);
+  const isUserTyping = useRef(false);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -23,7 +23,7 @@ function SearchInput({ defaultValue }: SearchInputProps) {
 
       if (value.trim() !== "") {
         params.set("search", value.trim());
-        params.set("page", "1"); // Only reset to page 1 when searching
+        params.set("page", "1");
       } else {
         params.delete("search");
         params.set("page", "1");
@@ -36,40 +36,29 @@ function SearchInput({ defaultValue }: SearchInputProps) {
     [searchParams, router]
   );
 
-  // Sync input with URL search param when it changes externally
+  // Debounce effect
   useEffect(() => {
-    const currentSearch = searchParams.get("search") || "";
-    if (currentSearch !== searchTerm) {
-      setSearchTerm(currentSearch);
-    }
-  }, [searchParams, searchTerm]);
-
-  // Debounce effect - skip on first render
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const currentSearch = searchParams.get("search") || "";
-
-    // Only trigger search if the value actually changed
-    if (searchTerm === currentSearch) {
-      return;
-    }
+    if (!isUserTyping.current) return;
 
     const timer = setTimeout(() => {
       handleSearch(searchTerm);
+      isUserTyping.current = false;
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [handleSearch, searchParams, searchTerm]); 
+  }, [searchTerm, handleSearch]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleSearch(searchTerm);
+      isUserTyping.current = false;
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    isUserTyping.current = true;
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -80,7 +69,7 @@ function SearchInput({ defaultValue }: SearchInputProps) {
         className="border p-1.5 pl-10 rounded-md w-full"
         placeholder="Search..."
         value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
       {isPending && (
