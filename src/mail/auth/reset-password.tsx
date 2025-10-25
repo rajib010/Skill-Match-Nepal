@@ -74,7 +74,7 @@ export default function ResetPassword({ user, url }: Props) {
                             color: '#6b7280',
                             lineHeight: '1.5'
                         }}>
-                            We received a request to reset your password for your H-one account.
+                            We received a request to reset your password for your Skill Match account.
                             If you didn&apos;t make this request, you can safely ignore this email.
                         </p>
 
@@ -167,7 +167,7 @@ export default function ResetPassword({ user, url }: Props) {
                                         color: '#92400e',
                                         lineHeight: '1.4'
                                     }}>
-                                        Never share your password with anyone. H-one will never ask for your password via email.
+                                        Never share your password with anyone. Skill Match will never ask for your password via email.
                                     </p>
                                 </div>
                             </div>
@@ -186,7 +186,7 @@ export default function ResetPassword({ user, url }: Props) {
                             fontSize: '14px',
                             color: '#64748b'
                         }}>
-                            This email was sent from H-one Thermal Therapy
+                            This email was sent from Skill Match Job Recommendation System
                         </p>
                         <p style={{
                             margin: 0,
@@ -206,7 +206,7 @@ export default function ResetPassword({ user, url }: Props) {
                     color: '#94a3b8'
                 }}>
                     <p style={{ margin: 0 }}>
-                        © {new Date().getFullYear()} H-one Thermal Therapy. All rights reserved.
+                        © {new Date().getFullYear()} Skill Match Job Recommendation System. All rights reserved.
                     </p>
                 </div>
             </body>

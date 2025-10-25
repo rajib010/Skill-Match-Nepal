@@ -51,7 +51,7 @@ export default function VerifyEmail({ user, url }: Props) {
                             fontSize: '16px',
                             opacity: 0.9
                         }}>
-                            Welcome to H-one! Let&apos;s get you started
+                            Welcome to Skill Match! Let&apos;s get you started
                         </p>
                     </div>
 
@@ -74,7 +74,7 @@ export default function VerifyEmail({ user, url }: Props) {
                             color: '#6b7280',
                             lineHeight: '1.5'
                         }}>
-                            Thank you for signing up for H-one! We&apos;re excited to have you join our thermal therapy community.
+                            Thank you for signing up for Skill Match! We&apos;re excited to have you join our thermal therapy community.
                         </p>
 
                         <p style={{
@@ -185,7 +185,7 @@ export default function VerifyEmail({ user, url }: Props) {
                             fontSize: '14px',
                             color: '#64748b'
                         }}>
-                            This email was sent from H-one Thermal Therapy
+                            This email was sent from Skill Match
                         </p>
                         <p style={{
                             margin: 0,
@@ -205,7 +205,7 @@ export default function VerifyEmail({ user, url }: Props) {
                     color: '#94a3b8'
                 }}>
                     <p style={{ margin: 0 }}>
-                        © {new Date().getFullYear()} H-one Thermal Therapy. All rights reserved.
+                        © {new Date().getFullYear()} Skill Match Nepal. All rights reserved.
                     </p>
                 </div>
             </body>
