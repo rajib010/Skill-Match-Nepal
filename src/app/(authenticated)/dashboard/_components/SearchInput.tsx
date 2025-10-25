@@ -2,7 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition, useEffect, useCallback } from "react";
+import { useState, useTransition, useEffect, useCallback, useRef } from "react";
 
 interface SearchInputProps {
   defaultValue?: string;
@@ -12,7 +12,10 @@ function SearchInput({ defaultValue }: SearchInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [searchTerm, setSearchTerm] = useState(defaultValue || "");
+  const [searchTerm, setSearchTerm] = useState(
+    searchParams.get("search") || defaultValue || ""
+  );
+  const isFirstRender = useRef(true);
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -20,7 +23,7 @@ function SearchInput({ defaultValue }: SearchInputProps) {
 
       if (value.trim() !== "") {
         params.set("search", value.trim());
-        params.set("page", "1");
+        params.set("page", "1"); // Only reset to page 1 when searching
       } else {
         params.delete("search");
         params.set("page", "1");
@@ -33,18 +36,39 @@ function SearchInput({ defaultValue }: SearchInputProps) {
     [searchParams, router]
   );
 
-  // Debounce effect
+  // Sync input with URL search param when it changes externally
   useEffect(() => {
+    const currentSearch = searchParams.get("search") || "";
+    if (currentSearch !== searchTerm) {
+      setSearchTerm(currentSearch);
+    }
+  }, [searchParams, searchTerm]);
+
+  // Debounce effect - skip on first render
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    const currentSearch = searchParams.get("search") || "";
+
+    // Only trigger search if the value actually changed
+    if (searchTerm === currentSearch) {
+      return;
+    }
+
     const timer = setTimeout(() => {
       handleSearch(searchTerm);
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, handleSearch]);
+  }, [handleSearch, searchParams, searchTerm]); 
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      handleSearch(searchTerm);
     }
   };
 
