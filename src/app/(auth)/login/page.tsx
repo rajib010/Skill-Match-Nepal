@@ -1,6 +1,10 @@
 "use client";
 
-import { sendVerificationEmail, signIn, signInWithGoogle } from "@/lib/auth/client";
+import {
+  sendVerificationEmail,
+  signIn,
+  signInWithGoogle,
+} from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -16,15 +20,14 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import Image from "next/image";
-import logo from "../../../../public/logo.jpg"
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Shield, Users, Zap } from "lucide-react";
+import { AuthSidePanel } from "@/components/auth/AuthSidePanel";
 
 export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const router = useRouter();
 
@@ -64,18 +67,18 @@ export default function LoginPage() {
     router.push("/dashboard");
   }
 
-   async function handleGoogleSignIn() {
-     setError("");
-     setGoogleLoading(true);
+  async function handleGoogleSignIn() {
+    setError("");
+    setGoogleLoading(true);
 
-     try {
-       await signInWithGoogle("/");
-       // Redirect will be handled by Better Auth
-     } catch {
-       setGoogleLoading(false);
-       setError("Failed to sign in with Google. Please try again.");
-     }
-   }
+    try {
+      await signInWithGoogle("/");
+      // Redirect will be handled by Better Auth
+    } catch {
+      setGoogleLoading(false);
+      setError("Failed to sign in with Google. Please try again.");
+    }
+  }
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -83,12 +86,37 @@ export default function LoginPage() {
         <div className={cn("flex flex-col gap-6")}>
           <Card className="overflow-hidden p-0">
             <CardContent className="grid p-0 md:grid-cols-2">
+              <AuthSidePanel
+                type="login"
+                features={[
+                  {
+                    icon: Shield,
+                    title: "Secure & Private",
+                    description:
+                      "Your data is encrypted and protected with industry-standard security.",
+                  },
+                  {
+                    icon: Zap,
+                    title: "Lightning Fast",
+                    description:
+                      "Access your dashboard instantly with our optimized platform.",
+                  },
+                  {
+                    icon: Users,
+                    title: "Trusted by Thousands",
+                    description:
+                      "Join our growing community of satisfied users.",
+                  },
+                ]}
+              />
               <form onSubmit={handleSubmit} className="p-6 md:p-8 w-full">
                 <FieldGroup>
-                  <div className="flex flex-col items-center gap-2 text-center mb-4">
-                    <h1 className="text-2xl font-bold">Welcome back</h1>
-                    <p className="text-muted-foreground text-balance">
+                  <div className="flex flex-col gap-2 text-center">
+                    <h1 className="text-2xl font-bold">
                       Sign in to your account
+                    </h1>
+                    <p className="text-sm text-muted-foreground">
+                      Welcome back! Please enter your details.
                     </p>
                   </div>
 
@@ -138,7 +166,7 @@ export default function LoginPage() {
                     </div>
                   </Field>
 
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 my-1">
                     <input
                       id="remember-me"
                       name="remember-me"
@@ -147,14 +175,16 @@ export default function LoginPage() {
                     />
                     <label
                       htmlFor="remember-me"
-                      className="text-sm text-gray-700"
+                      className="text-sm text-muted-foreground"
                     >
                       Remember me
                     </label>
                   </div>
 
                   {error && (
-                    <div className="text-sm text-red-600 mt-2">{error}</div>
+                    <div className="rounded-md bg-red-50 p-3 text-sm text-red-600 border border-red-200">
+                      {error}
+                    </div>
                   )}
 
                   <Field>
@@ -214,13 +244,6 @@ export default function LoginPage() {
                   </FieldDescription>
                 </FieldGroup>
               </form>
-              <div className="bg-muted relative hidden md:block">
-                <Image
-                  src={logo}
-                  alt="Login illustration"
-                  className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                />
-              </div>
             </CardContent>
           </Card>
 
