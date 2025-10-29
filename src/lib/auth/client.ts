@@ -31,7 +31,7 @@ export const signIn = authClient.signIn.email;
 
 export const signUp = authClient.signUp.email;
 
-export const signInWithGoogle = async (callbackURL: string = "/dashboard") => {
+export const signInWithGoogle = async (callbackURL: string = "/") => {
   return await authClient.signIn.social({
     provider: "google",
     callbackURL,

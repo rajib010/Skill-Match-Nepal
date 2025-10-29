@@ -69,7 +69,7 @@ export default function LoginPage() {
      setGoogleLoading(true);
 
      try {
-       await signInWithGoogle();
+       await signInWithGoogle("/");
        // Redirect will be handled by Better Auth
      } catch {
        setGoogleLoading(false);

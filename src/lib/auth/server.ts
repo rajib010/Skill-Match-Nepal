@@ -8,7 +8,6 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin as adminPlugin } from "better-auth/plugins";
 import { headers } from "next/headers";
-import { cache } from "react";
 
 export const auth = betterAuth({
   baseURL: APP_URL,
@@ -91,10 +90,14 @@ export const isAuthenticated = async () => {
   return !!session;
 };
 
-export const getSignedInUser = cache(async (headersForRequest: HeadersInit) => {
-  const session = await auth.api.getSession({ headers: headersForRequest });
+export const getSignedInUser = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
   if (!session) throw new Error("Not authenticated");
+
   return session.user;
-});
+};
 
 export type SignedInUser = Awaited<ReturnType<typeof getSignedInUser>>;

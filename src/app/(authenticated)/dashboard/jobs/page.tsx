@@ -61,7 +61,6 @@ export default async function Page({ searchParams }: iAppProps) {
     : "createdAt";
 
   const res = await getAllJobs(page, limit, search, sortField, sortOrder);
-  console.log("🚀 ~ Page ~ res:", res);
 
   if (!res.success) {
     <ErrorDisplay message={res.message} />;

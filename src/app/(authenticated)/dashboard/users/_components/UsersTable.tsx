@@ -33,7 +33,6 @@ interface iAppProps {
 }
 
 export function UserTable({ users, limit, page, search }: iAppProps) {
-  console.log("🚀 ~ UserTable ~ users:", users);
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [isBlockDialogOpen, setIsBlockDialogOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
