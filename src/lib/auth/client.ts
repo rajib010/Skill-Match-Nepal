@@ -31,6 +31,13 @@ export const signIn = authClient.signIn.email;
 
 export const signUp = authClient.signUp.email;
 
+export const signInWithGoogle = async (callbackURL: string = "/dashboard") => {
+  return await authClient.signIn.social({
+    provider: "google",
+    callbackURL,
+  });
+};
+
 export const isAuthenticated = () =>
   authClient.getSession().then((session) => !!session.data?.user);
 

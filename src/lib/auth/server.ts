@@ -1,4 +1,4 @@
-import { APP_URL, NODE_ENV } from "@/config";
+import { APP_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NODE_ENV } from "@/config";
 import { prisma } from "@/database/prisma";
 import { admin, centerOwner, teacher, customer, ac } from "@/lib/auth/access";
 import { sendMail } from "@/lib/mailer";
@@ -43,7 +43,7 @@ export const auth = betterAuth({
         console.log(`Reset password url for ${user.email}: ${url}`);
       }
 
-     await sendMail({
+      await sendMail({
         to: user.email,
         subject: "Reset your password",
         content: {
@@ -62,7 +62,7 @@ export const auth = betterAuth({
         console.log(`Verification url for ${user.email}: ${url}`);
       }
 
-      sendMail({
+      await sendMail({
         to: user.email,
         subject: "Verify your email",
         content: {
@@ -73,6 +73,12 @@ export const auth = betterAuth({
           },
         },
       });
+    },
+  },
+  socialProviders: {
+    google: {
+      clientId: GOOGLE_CLIENT_ID as string,
+      clientSecret: GOOGLE_CLIENT_SECRET as string,
     },
   },
 });
@@ -91,5 +97,4 @@ export const getSignedInUser = cache(async (headersForRequest: HeadersInit) => {
   return session.user;
 });
 
-
-export type SignedInUser = Awaited<ReturnType<typeof getSignedInUser>>
+export type SignedInUser = Awaited<ReturnType<typeof getSignedInUser>>;
