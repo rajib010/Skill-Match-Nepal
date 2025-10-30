@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 140" width="500" height="140">
+    <defs>
+        <linearGradient id="mainGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#4169e1;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#3a5fcf;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#2d4bb5;stop-opacity:1" />
+        </linearGradient>
+
+        <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#5a7fe8;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#4169e1;stop-opacity:1" />
+        </linearGradient>
+
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+            <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+
+        <filter id="shadow">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-opacity="0.2" />
+        </filter>
+    </defs>
+
+    <!-- Geometric Icon - Interlocking hexagons representing connection -->
+    <g transform="translate(20, 35)" filter="url(#shadow)">
+        <!-- First hexagon -->
+        <path d="M 30 15 L 45 7.5 L 60 15 L 60 30 L 45 37.5 L 30 30 Z"
+            fill="url(#mainGradient)"
+            stroke="#3a5fcf"
+            stroke-width="2.5" />
+
+        <!-- Second hexagon (interlocked) -->
+        <path d="M 50 30 L 65 22.5 L 80 30 L 80 45 L 65 52.5 L 50 45 Z"
+            fill="url(#accentGradient)"
+            stroke="#4169e1"
+            stroke-width="2.5" />
+
+        <!-- Connection line -->
+        <line x1="45" y1="37.5" x2="65" y2="22.5"
+            stroke="#5a7fe8"
+            stroke-width="3"
+            stroke-linecap="round"
+            opacity="0.6" />
+
+        <!-- Small accent dots -->
+        <circle cx="45" cy="37.5" r="3.5" fill="#5a7fe8" />
+        <circle cx="65" cy="22.5" r="3.5" fill="#5a7fe8" />
+    </g>
+
+    <!-- Text: Skill -->
+    <g filter="url(#shadow)">
+        <text x="130" y="75"
+            font-family="'Montserrat', 'Helvetica Neue', 'Arial Black', sans-serif"
+            font-size="56"
+            font-weight="900"
+            letter-spacing="1"
+            fill="url(#mainGradient)">
+            Skill
+        </text>
+    </g>
+
+    <!-- Stylized Hyphen/Connector -->
+    <g transform="translate(257, 70)">
+        <rect x="-3" y="-6" width="20" height="6"
+            rx="3"
+            fill="url(#accentGradient)"
+            filter="url(#shadow)" />
+        <circle cx="18" cy="-3" r="4" fill="#4169e1" opacity="0.8" />
+    </g>
+
+    <!-- Text: Match -->
+    <g filter="url(#shadow)">
+        <text x="285" y="75"
+            font-family="'Montserrat', 'Helvetica Neue', 'Arial Black', sans-serif"
+            font-size="56"
+            font-weight="900"
+            letter-spacing="1"
+            fill="url(#mainGradient)">
+            Match
+        </text>
+    </g>
+
+    <!-- Tagline or accent line -->
+    <g opacity="0.4">
+        <line x1="130" y1="95" x2="230" y2="95"
+            stroke="url(#accentGradient)"
+            stroke-width="3"
+            stroke-linecap="round" />
+        <line x1="285" y1="95" x2="470" y2="95"
+            stroke="url(#accentGradient)"
+            stroke-width="3"
+            stroke-linecap="round" />
+    </g>
+
+    <!-- Optional: Small accent stars/sparkles -->
+    <g opacity="0.6" fill="#5a7fe8">
+        <circle cx="475" cy="50" r="2.5" />
+        <circle cx="485" cy="60" r="1.5" />
+        <circle cx="125" cy="40" r="2" />
+    </g>
+</svg>

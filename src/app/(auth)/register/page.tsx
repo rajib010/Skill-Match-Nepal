@@ -18,12 +18,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, Shield, Zap, Users } from "lucide-react";
 import { AuthSidePanel } from "@/components/auth/AuthSidePanel";
+import Image from "next/image";
+import logo from "../../../../public/logo.svg";
 
 export default function RegisterPage() {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -64,17 +66,17 @@ export default function RegisterPage() {
   }
 
   async function handleGoogleSignIn() {
-       setError("");
-       setGoogleLoading(true);
-  
-       try {
-         await signInWithGoogle("/");
-         // Redirect will be handled by Better Auth
-       } catch {
-         setGoogleLoading(false);
-         setError("Failed to sign in with Google. Please try again.");
-       }
-     }
+    setError("");
+    setGoogleLoading(true);
+
+    try {
+      await signInWithGoogle("/");
+      // Redirect will be handled by Better Auth
+    } catch {
+      setGoogleLoading(false);
+      setError("Failed to sign in with Google. Please try again.");
+    }
+  }
 
   return (
     <div className="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
@@ -108,7 +110,15 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="p-6 md:p-8 w-full">
                 <FieldGroup>
                   <div className="flex flex-col items-center gap-2 text-center mb-4">
-                    <h1 className="text-2xl font-bold">Create your account</h1>
+                    <Image
+                      src={logo}
+                      alt="Skill Match Logo"
+                      width={300}
+                      height={100}
+                    />
+                    <p className="text-sm text-muted-foreground">
+                      Please enter your details.
+                    </p>
                   </div>
 
                   <Field>
