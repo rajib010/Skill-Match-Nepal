@@ -116,9 +116,6 @@ export default function RegisterPage() {
                       width={300}
                       height={100}
                     />
-                    <p className="text-sm text-muted-foreground">
-                      Please enter your details.
-                    </p>
                   </div>
 
                   <Field>
@@ -141,10 +138,6 @@ export default function RegisterPage() {
                       placeholder="m@example.com"
                       required
                     />
-                    <FieldDescription>
-                      We&apos;ll use this email to contact you. We will not
-                      share it with anyone.
-                    </FieldDescription>
                   </Field>
 
                   <Field className="grid grid-cols-1 md:grid-cols-2 gap-4">

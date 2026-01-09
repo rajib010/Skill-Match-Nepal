@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "./dashboard.css";
+import { UserProvider } from "@/providers/UserProvider";
 
 export default async function AuthenticatedLayout({
   children,
@@ -20,26 +21,24 @@ export default async function AuthenticatedLayout({
     redirect("/");
   }
 
-  const user: User = {
-    ...userData,
-    image: userData.image ?? undefined,
-    role: (userData.role ?? "user") as "user" | "admin",
-  };
-
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="inset" user={user} />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="p-4 min-h-screen">{children}</div>
-      </SidebarInset>
-    </SidebarProvider>
+    <UserProvider user={userData}>
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
+        <AppSidebar variant="inset" />
+        <SidebarInset>
+          <div className="sticky min-w-[200] top-0 z-10 bg-background border-b">
+            <SiteHeader />
+          </div>
+          <div className="p-4 min-h-screen">{children}</div>
+        </SidebarInset>
+      </SidebarProvider>
+    </UserProvider>
   );
 }

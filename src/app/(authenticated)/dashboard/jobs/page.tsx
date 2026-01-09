@@ -22,14 +22,6 @@ const sortFields = [
     },
   },
   {
-    label: "Company",
-    key: "company",
-    options: {
-      asc: "Company A-Z",
-      desc: "Company Z-A",
-    },
-  },
-  {
     label: "Date",
     key: "createdAt",
     options: {
@@ -54,10 +46,10 @@ export default async function Page({ searchParams }: iAppProps) {
       ? resolvedParams.sort
       : "asc";
 
-  const sortField = ["title", "company", "createdAt"].includes(
+  const sortField = ["title", "createdAt"].includes(
     resolvedParams.sortField as string
   )
-    ? (resolvedParams.sortField as "title" | "createdAt" | "company")
+    ? (resolvedParams.sortField as "title" | "createdAt")
     : "createdAt";
 
   const res = await getAllJobs(page, limit, search, sortField, sortOrder);

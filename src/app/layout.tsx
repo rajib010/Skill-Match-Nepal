@@ -1,46 +1,6 @@
 import type { Metadata } from "next";
-import {
-  DM_Serif_Display,
-  Geist_Mono,
-  Lexend,
-  Outfit,
-  Red_Rose,
-} from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import { Poppins } from "next/font/google";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  weight: ["400", "500", "600", "700"],
-});
-
-const outfit = Outfit({
-  variable: "--font-outfit",
-  weight: ["400", "500", "600", "700"],
-});
-
-const dm_serif = DM_Serif_Display({
-  variable: "--font-dm-serif",
-  style: ["normal", "italic"],
-  weight: ["400"],
-});
-
-const lexend = Lexend({
-  variable: "--font-lexend",
-  weight: ["400", "500", "600", "700"],
-});
-
-const redrose = Red_Rose({
-  variable: "--font-redrose",
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -54,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={` ${geistMono.variable} ${poppins.variable} ${outfit.variable} ${dm_serif.variable} ${lexend.variable} ${redrose.variable} antialiased`}
-      >
+      <body className="antialiased">
         <Toaster />
         {children}
       </body>

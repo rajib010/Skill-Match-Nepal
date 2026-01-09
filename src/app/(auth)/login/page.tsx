@@ -115,9 +115,6 @@ export default function LoginPage() {
                 <FieldGroup>
                   <div className="flex flex-col gap-2 text-center items-center">
                     <Image src={logo} alt="skill match logo" width={300} height={100}/>
-                    <p className="text-sm text-muted-foreground">
-                      Please enter your details.
-                    </p>
                   </div>
 
                   <Field>
