@@ -2,7 +2,7 @@
 
 import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition, useEffect, useCallback, useRef } from "react";
+import { useState, useTransition, useEffect, useRef } from "react";
 
 interface SearchInputProps {
   defaultValue?: string;
@@ -12,54 +12,60 @@ function SearchInput({ defaultValue }: SearchInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [searchTerm, setSearchTerm] = useState(
-    searchParams.get("search") || defaultValue || ""
-  );
-  const isUserTyping = useRef(false);
 
-  const handleSearch = useCallback(
-    (value: string) => {
+  const urlSearchTerm = searchParams.get("search") || "";
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSearchedRef = useRef(urlSearchTerm);
+
+  const [searchTerm, setSearchTerm] = useState(
+    urlSearchTerm || defaultValue || ""
+  );
+
+  // Debounce search
+  useEffect(() => {
+    // Don't search if value hasn't changed from URL
+    if (searchTerm === lastSearchedRef.current) return;
+
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+
+    timerRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
 
-      if (value.trim() !== "") {
-        params.set("search", value.trim());
-        params.set("page", "1");
+      if (searchTerm.trim()) {
+        params.set("search", searchTerm.trim());
       } else {
         params.delete("search");
-        params.set("page", "1");
       }
 
+      params.set("page", "1");
+
+      lastSearchedRef.current = searchTerm;
+
       startTransition(() => {
-        router.push(`?${params.toString()}`);
+        router.push(`?${params.toString()}`, { scroll: false });
       });
-    },
-    [searchParams, router]
-  );
-
-  // Debounce effect
-  useEffect(() => {
-    if (!isUserTyping.current) return;
-
-    const timer = setTimeout(() => {
-      handleSearch(searchTerm);
-      isUserTyping.current = false;
     }, 500);
 
-    return () => clearTimeout(timer);
-  }, [searchTerm, handleSearch]);
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [searchTerm, urlSearchTerm, searchParams, router]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch(searchTerm);
-      isUserTyping.current = false;
+  // Sync with URL when it changes externally
+  useEffect(() => {
+    if (
+      urlSearchTerm !== searchTerm &&
+      urlSearchTerm !== lastSearchedRef.current
+    ) {
+      setSearchTerm(urlSearchTerm);
+      lastSearchedRef.current = urlSearchTerm;
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    isUserTyping.current = true;
-    setSearchTerm(e.target.value);
-  };
+  }, [urlSearchTerm, searchTerm]);
 
   return (
     <div className="relative">
@@ -69,8 +75,8 @@ function SearchInput({ defaultValue }: SearchInputProps) {
         className="border p-1.5 pl-10 rounded-md w-full"
         placeholder="Search..."
         value={searchTerm}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
       />
       {isPending && (
         <div className="absolute right-3 top-1/2 -translate-y-1/2">
