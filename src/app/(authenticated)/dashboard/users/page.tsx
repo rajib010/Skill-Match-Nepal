@@ -66,9 +66,9 @@ export default async function Page({ searchParams }: iAppProps) {
 
   return (
     <main className="main-page">
-      <h1 className="font-semibold text-2xl">Users Page</h1>
+      <h1 className="page-header">Users Page</h1>
       {/* button to open create DCR link */}
-      <div className="flex justify-between items-center">
+      <div className="filters-wrapper">
         <h2>
           {search ? `Showing results for "${search}"` : "List of all users"}
         </h2>

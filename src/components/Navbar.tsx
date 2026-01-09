@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut, Moon, Sun } from "lucide-react";
+import { User, LogOut } from "lucide-react";
 import logo from "../../public/logo.svg";
 import Image from "next/image";
 import UserImage from "@/app/(authenticated)/dashboard/_components/UserImage";
@@ -20,7 +19,6 @@ import { toast } from "sonner";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
   const router = useRouter();
 
   const isActive = (path: string) => pathname === path;
@@ -80,26 +78,6 @@ export default function Navbar() {
                       <User className="mr-2 h-4 w-4" />
                       View Profile
                     </Link>
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    onClick={() =>
-                      setTheme(theme === "dark" ? "light" : "dark")
-                    }
-                  >
-                    {theme === "dark" ? (
-                      <>
-                        <Sun className="mr-2 h-4 w-4" />
-                        Light Mode
-                      </>
-                    ) : (
-                      <>
-                        <Moon className="mr-2 h-4 w-4" />
-                        Dark Mode
-                      </>
-                    )}
                   </DropdownMenuItem>
 
                   <DropdownMenuSeparator />
