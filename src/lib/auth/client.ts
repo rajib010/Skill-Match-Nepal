@@ -25,6 +25,7 @@ export const {
   sendVerificationEmail,
   forgetPassword,
   accountInfo,
+  useSession,
 } = authClient;
 
 export const signIn = authClient.signIn.email;

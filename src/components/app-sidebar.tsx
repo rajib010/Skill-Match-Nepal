@@ -23,11 +23,15 @@ import Link from "next/link";
 import logo from "../../public/logo.svg";
 import Image from "next/image";
 import { Badge } from "./ui/badge";
-import { useUser } from "@/providers/UserProvider";
 import { constructUrl } from "@/lib/cloudinary/utils";
+import { useUser } from "@/context/useUser";
+import { redirect } from "next/navigation";
 
 export function AppSidebar({ ...props }) {
   const { user } = useUser();
+  if (!user) {
+    redirect("/login");
+  }
 
   const isAdmin = user && user.role === "admin";
 
@@ -107,7 +111,7 @@ export function AppSidebar({ ...props }) {
               asChild
               className="flex h-[var(--header-height)] items-center px-4"
             >
-              <Link href="/dashboard">
+              <Link href="/">
                 <Image
                   src={logo}
                   alt="H-One logo"

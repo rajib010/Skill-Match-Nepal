@@ -95,9 +95,7 @@ export const getSignedInUser = async () => {
     headers: await headers(),
   });
 
-  if (!session) throw new Error("Not authenticated");
-
-  return session.user;
+  return session?.user;
 };
 
 export type SignedInUser = Awaited<ReturnType<typeof getSignedInUser>>;

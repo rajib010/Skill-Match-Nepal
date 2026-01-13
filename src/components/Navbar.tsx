@@ -14,8 +14,9 @@ import { User, LogOut } from "lucide-react";
 import logo from "../../public/logo.svg";
 import Image from "next/image";
 import UserImage from "@/app/(authenticated)/dashboard/_components/UserImage";
-import { isAuthenticated, signOut } from "@/lib/auth/client";
 import { toast } from "sonner";
+import { signOut } from "@/lib/auth/client";
+import { useUser } from "@/context/useUser";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -23,8 +24,8 @@ export default function Navbar() {
 
   const isActive = (path: string) => pathname === path;
 
-  const isAuth = isAuthenticated()
-  
+  const { user } = useUser();
+  console.log("🚀 ~ Navbar ~ user :", user )
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -66,7 +67,7 @@ export default function Navbar() {
 
           {/* Right Side Controls */}
           <div className="flex items-center gap-4">
-            {isAuth ? (
+            {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger className="cursor-pointer">
                   <UserImage />
