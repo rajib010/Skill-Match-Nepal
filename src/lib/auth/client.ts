@@ -1,5 +1,5 @@
 import { APP_URL } from "@/config";
-import { admin, customer, ac, centerOwner, teacher } from "@/lib/auth/access";
+import { admin, user, ac} from "@/lib/auth/access";
 import { createAuthClient } from "better-auth/client";
 import { adminClient } from "better-auth/client/plugins";
 
@@ -10,9 +10,7 @@ const authClient = createAuthClient({
       ac,
       roles: {
         admin,
-        customer,
-        centerOwner,
-        teacher,
+        user,
       },
     }),
   ],

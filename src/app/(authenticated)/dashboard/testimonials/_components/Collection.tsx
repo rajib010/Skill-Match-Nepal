@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { SquarePenIcon, Trash2 } from "lucide-react";
 import TestimonialForm from "./TestimonialForm";
-import { AlertModal } from "../../_components/AlertModal";
+import { AlertModal } from "../../_components/alert-modal";
 import { toast } from "sonner";
 
 interface iAppProps {

@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { AlertModal } from "@/app/(authenticated)/dashboard/_components/AlertModal";
+import { AlertModal } from "@/app/(authenticated)/dashboard/_components/alert-modal";
 import { signOut } from "@/lib/auth/client";
 import { useState } from "react";
 

@@ -23,7 +23,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useState, memo } from "react";
-import { AlertModal } from "@/app/(authenticated)/dashboard/_components/AlertModal";
+import { AlertModal } from "@/app/(authenticated)/dashboard/_components/alert-modal";
 import { signOut } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
 

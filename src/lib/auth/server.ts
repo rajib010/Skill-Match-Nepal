@@ -1,6 +1,6 @@
 import { APP_URL, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, NODE_ENV } from "@/config";
 import { prisma } from "@/database/prisma";
-import { admin, centerOwner, teacher, customer, ac } from "@/lib/auth/access";
+import { admin, user, ac } from "@/lib/auth/access";
 import { sendMail } from "@/lib/mailer";
 import ResetPassword from "@/mail/auth/reset-password";
 import VerifyEmail from "@/mail/auth/verify-email";
@@ -18,14 +18,12 @@ export const auth = betterAuth({
   },
   plugins: [
     adminPlugin({
-      defaultRole: "customer",
+      defaultRole: "user",
       adminRoles: ["admin"],
       ac,
       roles: {
         admin,
-        customer,
-        centerOwner,
-        teacher,
+        user,
       },
     }),
   ],

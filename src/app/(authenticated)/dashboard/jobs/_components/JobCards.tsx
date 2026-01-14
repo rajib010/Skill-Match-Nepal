@@ -22,7 +22,7 @@ import {
   IconCalendar,
 } from "@tabler/icons-react";
 import { useCallback, useState } from "react";
-import { AlertModal } from "../../_components/AlertModal";
+import { AlertModal } from "../../_components/alert-modal";
 import { JobDetailModal, RequirementType } from "./JobDetailModal";
 import { cn, formatDate } from "@/lib/utils";
 import { JobEditModal } from "./JobEditModal";

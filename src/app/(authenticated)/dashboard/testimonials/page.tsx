@@ -1,12 +1,12 @@
-import { PaginationComponent } from "../_components/PaginationComponent";
+import { PaginationComponent } from "../_components/pagination-component";
 import { notFound } from "next/navigation";
-import SearchInput from "../_components/SearchInput";
-import DropDownFilter from "../_components/DropdownFilter";
+import SearchInput from "../_components/search-input";
+import DropDownFilter from "../_components/dropdown-filter";
 import { getAllTestimonials } from "./action";
 import AddTestimonialButton from "./_components/AddTestimonialButton";
 import TestimonialCollection from "./_components/Collection";
 import { getSignedInUser } from "@/lib/auth/server";
-import EmptyState from "../_components/EmptyState";
+import EmptyState from "../_components/empty-state";
 
 interface TestimonialManagementPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

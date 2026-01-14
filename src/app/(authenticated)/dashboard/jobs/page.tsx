@@ -1,12 +1,12 @@
-import DropDownFilter from "../_components/DropdownFilter";
-import { ErrorDisplay } from "../_components/ErrorDisplay";
-import { PaginationComponent } from "../_components/PaginationComponent";
-import SearchInput from "../_components/SearchInput";
+import DropDownFilter from "../_components/dropdown-filter";
+import { ErrorDisplay } from "../_components/error-display";
+import { PaginationComponent } from "../_components/pagination-component";
+import SearchInput from "../_components/search-input";
 import { getAllJobs } from "./action";
 import { JobCards } from "./_components/JobCards";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { BriefcaseBusiness } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;
@@ -63,7 +63,7 @@ export default async function Page({ searchParams }: iAppProps) {
 
   return (
     <main className="main-page">
-      <h1 className="page-header">Jobs Page</h1>
+      <h1 className="page-header">Jobs Management Page</h1>
       {/* button to open create DCR link */}
       <div className="filters-wrapper">
         <h2>
@@ -71,11 +71,7 @@ export default async function Page({ searchParams }: iAppProps) {
         </h2>
         <div className="flex items-center justify-between gap-2">
           {/* add button */}
-          <Button asChild>
-            <Link href="/dashboard/customers/add">
-              <BriefcaseBusiness /> Add Job
-            </Link>
-          </Button>
+
           {/* search */}
           <SearchInput />
           {/* filters */}

@@ -1,15 +1,9 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-// import { Footer } from "@/components/Footer";
 import {
-  Briefcase,
   TrendingUp,
   Users,
   Zap,
-  CheckCircle2,
   Target,
 } from "lucide-react";
-import Link from "next/link";
 import Hero from "./_components/home/hero";
 import Features from "./_components/home/features";
 import Benefits from "./_components/home/benefits";
@@ -20,13 +14,13 @@ const features = [
     icon: Target,
     title: "Smart Matching",
     description:
-      "Our AI-powered algorithm matches your skills with the perfect job opportunities.",
+      "Our algorithm matches your skills with the perfect job opportunities.",
   },
   {
     icon: TrendingUp,
-    title: "Match Percentage",
+    title: "Top Searches",
     description:
-      "See how well you match each job with our detailed compatibility scores.",
+      "See the most searched jobs by other candidates.",
   },
   {
     icon: Zap,

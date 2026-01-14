@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import UserDetailComponent from "../../_components/UserDetailComponent";
+import UserDetailComponent from "../../_components/user-detail-component";
 import { Users } from "../action";
 
 interface iAppProps {

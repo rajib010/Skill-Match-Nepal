@@ -1,12 +1,6 @@
 "use client";
 
 import { memo, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +21,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { RequirementType } from "./JobDetailModal";
 import { jobSchema, JobSchemaType } from "../schema";
+import DialogWrapper from "../../_components/dialog-wrapper";
 
 interface Requirement {
   skillName: string;
@@ -44,9 +39,8 @@ export const JobEditModal = memo(function JobEditModal({
   onClose,
   job,
 }: iAppProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [requirements, setRequirements] = useState<Requirement[]>(
-    job.requirements.map((r:RequirementType) => ({
+    job.requirements.map((r: RequirementType) => ({
       skillName: r.skillName,
       required: r.required,
     }))
@@ -58,7 +52,7 @@ export const JobEditModal = memo(function JobEditModal({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<JobSchemaType>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
@@ -106,7 +100,6 @@ export const JobEditModal = memo(function JobEditModal({
       return;
     }
 
-    setIsSubmitting(true);
     try {
       const result = await updateJob(job.id, {
         ...data,
@@ -122,205 +115,202 @@ export const JobEditModal = memo(function JobEditModal({
     } catch {
       toast.error("Failed to update job");
     } finally {
-      setIsSubmitting(false);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!w-[700px] !max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Job</DialogTitle>
-        </DialogHeader>
+    <DialogWrapper
+      isOpen={isOpen}
+      noAutoClose={isDirty}
+      onOpenChange={onClose}
+      title="Edit Job"
+      key={"edit job"}
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        {/* Title */}
+        <div className="space-y-4">
+          <Label htmlFor="title">
+            Job Title <span className="required-field">*</span>
+          </Label>
+          <Input
+            id="title"
+            {...register("title")}
+            placeholder="e.g. Senior Frontend Developer"
+          />
+          {errors.title && (
+            <p className="text-xs text-red-600 mt-1">{errors.title.message}</p>
+          )}
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Title */}
+        {/* Company */}
+        <div className="space-y-4">
+          {" "}
+          <Label htmlFor="company">
+            Company <span className="required-field">*</span>
+          </Label>
+          <Input
+            id="company"
+            {...register("company")}
+            placeholder="e.g. Tech Corp"
+          />
+          {errors.company && (
+            <p className="text-xs text-red-600 mt-1">
+              {errors.company.message}
+            </p>
+          )}
+        </div>
+
+        {/* Location & Job Type */}
+        <div className="grid grid-cols-2 gap-4">
           <div className="space-y-4">
-            <Label htmlFor="title">
-              Job Title <span className="required-field">*</span>
+            {" "}
+            <Label htmlFor="location">
+              Location <span className="required-field">*</span>
             </Label>
             <Input
-              id="title"
-              {...register("title")}
-              placeholder="e.g. Senior Frontend Developer"
+              id="location"
+              {...register("location")}
+              placeholder="e.g. Kathmandu"
             />
-            {errors.title && (
+            {errors.location && (
               <p className="text-xs text-red-600 mt-1">
-                {errors.title.message}
+                {errors.location.message}
               </p>
             )}
           </div>
 
-          {/* Company */}
           <div className="space-y-4">
             {" "}
-            <Label htmlFor="company">
-              Company <span className="required-field">*</span>
+            <Label htmlFor="jobType">
+              Job Type <span className="required-field">*</span>
             </Label>
+            <Select
+              value={jobType}
+              onValueChange={(value) => setValue("jobType", value as string)}
+            >
+              <SelectTrigger className="w-full cursor-pointer">
+                <SelectValue placeholder="Select job type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="full-time">Full Time</SelectItem>
+                <SelectItem value="part-time">Part Time</SelectItem>
+                <SelectItem value="contract">Contract</SelectItem>
+                <SelectItem value="internship">Internship</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Salary */}
+        <div className="space-y-4">
+          {" "}
+          <Label htmlFor="salary">Salary (Optional)</Label>
+          <Input
+            id="salary"
+            {...register("salary")}
+            placeholder="e.g. Rs. 50,000 - 80,000"
+          />
+        </div>
+
+        {/* Description */}
+        <div className="space-y-4">
+          {" "}
+          <Label htmlFor="description">
+            Description <span className="required-field">*</span>
+          </Label>
+          <Textarea
+            id="description"
+            {...register("description")}
+            placeholder="Job description..."
+            rows={5}
+          />
+          {errors.description && (
+            <p className="text-xs text-red-600 mt-1">
+              {errors.description.message}
+            </p>
+          )}
+        </div>
+
+        {/* Status */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-4">
+            {" "}
+            <Label htmlFor="isActive">
+              Job Status <span className="required-field">*</span>
+            </Label>
+            <p className="text-xs text-gray-500">
+              Active jobs are visible to candidates
+            </p>
+          </div>
+          <Switch
+            id="isActive"
+            checked={isActive}
+            onCheckedChange={(checked) => setValue("isActive", checked)}
+          />
+        </div>
+
+        {/* Requirements */}
+        <div className="space-y-4">
+          {" "}
+          <Label>
+            Skills Required <span className="required-field">*</span>
+          </Label>
+          <div className="flex gap-2 mt-2">
             <Input
-              id="company"
-              {...register("company")}
-              placeholder="e.g. Tech Corp"
+              value={newSkill}
+              onChange={(e) => setNewSkill(e.target.value)}
+              placeholder="Add a skill..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addRequirement();
+                }
+              }}
             />
-            {errors.company && (
-              <p className="text-xs text-red-600 mt-1">
-                {errors.company.message}
-              </p>
-            )}
+            <Button type="button" onClick={addRequirement} size="icon">
+              <IconPlus className="h-4 w-4" />
+            </Button>
           </div>
-
-          {/* Location & Job Type */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-4">
-              {" "}
-              <Label htmlFor="location">
-                Location <span className="required-field">*</span>
-              </Label>
-              <Input
-                id="location"
-                {...register("location")}
-                placeholder="e.g. Kathmandu"
-              />
-              {errors.location && (
-                <p className="text-xs text-red-600 mt-1">
-                  {errors.location.message}
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-4">
-              {" "}
-              <Label htmlFor="jobType">
-                Job Type <span className="required-field">*</span>
-              </Label>
-              <Select
-                value={jobType}
-                onValueChange={(value) => setValue("jobType", value as string)}
-              >
-                <SelectTrigger className="w-full cursor-pointer">
-                  <SelectValue placeholder="Select job type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="full-time">Full Time</SelectItem>
-                  <SelectItem value="part-time">Part Time</SelectItem>
-                  <SelectItem value="contract">Contract</SelectItem>
-                  <SelectItem value="internship">Internship</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Salary */}
-          <div className="space-y-4">
-            {" "}
-            <Label htmlFor="salary">Salary (Optional)</Label>
-            <Input
-              id="salary"
-              {...register("salary")}
-              placeholder="e.g. Rs. 50,000 - 80,000"
-            />
-          </div>
-
-          {/* Description */}
-          <div className="space-y-4">
-            {" "}
-            <Label htmlFor="description">
-              Description <span className="required-field">*</span>
-            </Label>
-            <Textarea
-              id="description"
-              {...register("description")}
-              placeholder="Job description..."
-              rows={5}
-            />
-            {errors.description && (
-              <p className="text-xs text-red-600 mt-1">
-                {errors.description.message}
-              </p>
-            )}
-          </div>
-
-          {/* Status */}
-          <div className="flex items-center justify-between">
-            <div className="space-y-4">
-              {" "}
-              <Label htmlFor="isActive">
-                Job Status <span className="required-field">*</span>
-              </Label>
-              <p className="text-xs text-gray-500">
-                Active jobs are visible to candidates
-              </p>
-            </div>
-            <Switch
-              id="isActive"
-              checked={isActive}
-              onCheckedChange={(checked) => setValue("isActive", checked)}
-            />
-          </div>
-
-          {/* Requirements */}
-          <div className="space-y-4">
-            {" "}
-            <Label>
-              Skills Required <span className="required-field">*</span>
-            </Label>
-            <div className="flex gap-2 mt-2">
-              <Input
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-                placeholder="Add a skill..."
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    addRequirement();
-                  }
-                }}
-              />
-              <Button type="button" onClick={addRequirement} size="icon">
-                <IconPlus className="h-4 w-4" />
-              </Button>
-            </div>
-            {requirements.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {requirements.map((req) => (
-                  <div
-                    key={req.skillName}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border rounded-md"
+          {requirements.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-3">
+              {requirements.map((req) => (
+                <div
+                  key={req.skillName}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border rounded-md"
+                >
+                  <span className="text-sm">{req.skillName}</span>
+                  <Badge
+                    variant={req.required ? "default" : "secondary"}
+                    className="text-xs cursor-pointer"
+                    onClick={() => toggleRequired(req.skillName)}
                   >
-                    <span className="text-sm">{req.skillName}</span>
-                    <Badge
-                      variant={req.required ? "default" : "secondary"}
-                      className="text-xs cursor-pointer"
-                      onClick={() => toggleRequired(req.skillName)}
-                    >
-                      {req.required ? "Required" : "Preferred"}
-                    </Badge>
-                    <button
-                      type="button"
-                      onClick={() => removeRequirement(req.skillName)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      <IconX className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                    {req.required ? "Required" : "Preferred"}
+                  </Badge>
+                  <button
+                    type="button"
+                    onClick={() => removeRequirement(req.skillName)}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    <IconX className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update Job"}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        {/* Actions */}
+        <div className="flex justify-end gap-3 pt-4">
+          <Button type="button" variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Updating..." : "Update Job"}
+          </Button>
+        </div>
+      </form>
+    </DialogWrapper>
   );
 });

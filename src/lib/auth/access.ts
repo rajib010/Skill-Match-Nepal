@@ -13,14 +13,6 @@ export const admin = ac.newRole({
   ...adminAc.statements,
 });
 
-export const customer = ac.newRole({
-  ...userAc.statements,
-});
-
-export const teacher = ac.newRole({
-  ...userAc.statements,
-});
-
-export const centerOwner = ac.newRole({
+export const user = ac.newRole({
   ...userAc.statements,
 });

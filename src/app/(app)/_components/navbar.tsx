@@ -11,12 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, LogOut } from "lucide-react";
-import logo from "../../public/logo.svg";
-import Image from "next/image";
-import UserImage from "@/app/(authenticated)/dashboard/_components/UserImage";
+import UserImage from "@/app/(authenticated)/dashboard/_components/user-image";
 import { toast } from "sonner";
 import { signOut } from "@/lib/auth/client";
 import { useUser } from "@/context/useUser";
+import Logo from "./logo";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -25,7 +24,6 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path;
 
   const { user } = useUser();
-  console.log("🚀 ~ Navbar ~ user :", user )
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -33,15 +31,9 @@ export default function Navbar() {
         <div className="flex h-20 items-center justify-between">
           {/* Logo Section */}
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center">
-              <Image
-                src={logo}
-                alt="Skill Match logo"
-                priority
-                width={200}
-                height={200}
-              />
-            </Link>
+            
+              <Logo logoClass="text-white" textClass="text-black"/>
+         
 
             {/* Nav Links */}
             <div className="hidden md:flex items-center gap-6">

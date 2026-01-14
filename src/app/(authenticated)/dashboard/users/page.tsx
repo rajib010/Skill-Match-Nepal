@@ -1,7 +1,7 @@
-import DropDownFilter from "../_components/DropdownFilter";
-import { ErrorDisplay } from "../_components/ErrorDisplay";
-import { PaginationComponent } from "../_components/PaginationComponent";
-import SearchInput from "../_components/SearchInput";
+import DropDownFilter from "../_components/dropdown-filter";
+import { ErrorDisplay } from "../_components/error-display";
+import { PaginationComponent } from "../_components/pagination-component";
+import SearchInput from "../_components/search-input";
 import { getAllUsers } from "./action";
 import { UserTable } from "./_components/UsersTable";
 

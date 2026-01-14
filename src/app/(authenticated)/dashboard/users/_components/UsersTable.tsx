@@ -20,9 +20,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Ban, MoreHorizontal, NotebookTabs } from "lucide-react";
 import { getValue } from "@/app/(authenticated)/utils";
-import UserImage from "../../_components/UserImage";
+import UserImage from "../../_components/user-image";
 import { useCallback, useState } from "react";
-import { AlertModal } from "../../_components/AlertModal";
+import { AlertModal } from "../../_components/alert-modal";
 import { UserDetailModal } from "./UserDetailModal";
 
 interface iAppProps {

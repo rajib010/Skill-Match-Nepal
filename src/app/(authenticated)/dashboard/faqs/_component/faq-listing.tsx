@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { GripVertical, Loader2, SquarePenIcon, Trash2 } from "lucide-react";
-import ManageFaqForm from "./ManageFaqForm";
-import { AlertModal } from "../../_components/AlertModal";
+import ManageFaqForm from "./manage-faq-form";
+import { AlertModal } from "../../_components/alert-modal";
 import { toast } from "sonner";
 import {
   arrayMove,

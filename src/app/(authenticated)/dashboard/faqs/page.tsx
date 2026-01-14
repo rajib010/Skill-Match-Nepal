@@ -1,11 +1,11 @@
-import { PaginationComponent } from "../_components/PaginationComponent";
+import { PaginationComponent } from "../_components/pagination-component";
 import { notFound } from "next/navigation";
-import SearchInput from "../_components/SearchInput";
-import AddFaqButton from "./_component/AddFaqButton";
+import SearchInput from "../_components/search-input";
+import AddFaqButton from "./_component/add-faq-button";
 import { getAllFaqs } from "./action";
-import FaqListing from "./_component/FaqListing";
+import FaqListing from "./_component/faq-listing";
 import { getSignedInUser } from "@/lib/auth/server";
-import EmptyState from "../_components/EmptyState";
+import EmptyState from "../_components/empty-state";
 
 interface FaqsManagementPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;

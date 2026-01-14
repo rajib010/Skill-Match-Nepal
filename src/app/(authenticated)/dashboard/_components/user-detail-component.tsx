@@ -1,5 +1,5 @@
 import React from "react";
-import UserImage from "./UserImage";
+import UserImage from "./user-image";
 import { Users } from "../users/action";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
