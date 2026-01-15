@@ -4,6 +4,7 @@ import React from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -14,6 +15,7 @@ interface iAppProps {
   noAutoClose: boolean; //don't close on outside interaction
   title: string;
   children: React.ReactNode;
+  description?:string
 }
 
 function DialogWrapper({
@@ -21,6 +23,7 @@ function DialogWrapper({
   onOpenChange,
   noAutoClose,
   title,
+  description,
   children,
 }: iAppProps) {
   return (
@@ -42,6 +45,7 @@ function DialogWrapper({
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
           {children}
         </DialogHeader>
       </DialogContent>

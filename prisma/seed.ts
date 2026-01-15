@@ -273,7 +273,7 @@ async function main() {
   ];
 
   const users = [];
-  for (let i = 1; i <= 30; i++) {
+  for (let i = 1; i <= 5; i++) {
     const userPassword = await bcrypt.hash("User@123", 10);
     const numSkills = Math.floor(Math.random() * 8) + 5;
     const selectedSkills: string[] = [];
@@ -310,8 +310,6 @@ async function main() {
               Math.floor(Math.random() * 8) + 1
             } years in software development`,
             education: `Bachelor's in Computer Science`,
-            cvUrl: `/uploads/cv/user${i}.pdf`,
-            cvParsedAt: new Date(),
             skills: {
               create: selectedSkills.map((skill) => {
                 const levels = ["beginner", "intermediate", "expert"];
@@ -443,7 +441,6 @@ async function main() {
         }`,
         jobType: jobTypes[Math.floor(Math.random() * jobTypes.length)],
         categoryId: category.id,
-        postedById: adminUser.user.id,
         isActive: Math.random() > 0.1,
         expiresAt: new Date(
           Date.now() + Math.random() * 90 * 24 * 60 * 60 * 1000
@@ -505,7 +502,6 @@ async function main() {
           userId: user.id,
           matchScore: Math.round(matchScore * 100) / 100,
           status: statuses[Math.floor(Math.random() * statuses.length)],
-          coverLetter: `I am very interested in the ${job.title} position at ${job.company}. With my experience and skills, I believe I would be a great fit for your team.`,
         },
       });
       totalApplications++;
@@ -539,7 +535,7 @@ async function main() {
   console.log(`- Job Applications: ${applicationCount}`);
 
   console.log("\n🔑 Login Credentials:");
-  console.log("👑 Admin: admin@jobportal.com / Admin@123");
+  console.log("👑 Admin: admin@skillmatch.com / Admin@123");
   console.log("👤 User 1: user1@example.com / User@123");
   console.log("👤 User 2: user2@example.com / User@123");
   console.log("👤 User 3: user3@example.com / User@123");

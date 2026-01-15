@@ -15,7 +15,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const user = await getSignedInUser();
-  console.log("🚀 ~ RootLayout ~ user:", user)
   return (
     <html lang="en">
       <body className="antialiased">

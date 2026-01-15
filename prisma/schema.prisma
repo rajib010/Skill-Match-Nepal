@@ -42,10 +42,6 @@ model UserProfile {
   experience  String?  @db.Text
   education   String?  @db.Text
   
-  // CV related
-  cvUrl       String?
-  cvParsedAt  DateTime?
-  
   skills      UserSkill[]
   
   createdAt   DateTime @default(now())
@@ -95,8 +91,6 @@ model Job {
   categoryId  String
   category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   
-  postedById  String   // admin user id
-  
   isActive    Boolean  @default(true)
   expiresAt   DateTime?
   
@@ -107,7 +101,6 @@ model Job {
   updatedAt   DateTime @updatedAt
 
   @@index([categoryId, isActive])
-  @@index([postedById])
   @@map("job")
 }
 
@@ -136,9 +129,7 @@ model JobApplication {
   
   matchScore Float    // 0-100 score from keyword matching
   status     String   @default("pending") // pending, reviewed, accepted, rejected
-  
-  coverLetter String? @db.Text
-  
+    
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 

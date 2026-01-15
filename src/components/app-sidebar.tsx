@@ -4,11 +4,11 @@ import React from "react";
 import {
   IconHome,
   IconMessage2,
-  IconNews,
   IconSettings,
   IconUser,
   IconUserBitcoin,
-  IconLibraryPhoto,
+  IconPhoneCall,
+  IconNotification,
 } from "@tabler/icons-react";
 import { NavMain } from "@/components/nav-main";
 import {
@@ -76,24 +76,14 @@ export function AppSidebar({ ...props }) {
 
   const websiteInformation = [
     {
+      title: "Contact",
+      url: "/dashboard/contact",
+      icon: IconPhoneCall,
+    },
+    {
       title: "FAQs",
       url: "/dashboard/faqs",
-      icon: IconMessage2,
-    },
-    {
-      title: "Gallery",
-      url: "/dashboard/gallery",
-      icon: IconLibraryPhoto,
-    },
-    {
-      title: "News",
-      url: "/dashboard/news",
-      icon: IconNews,
-    },
-    {
-      title: "Team",
-      url: "/dashboard/team",
-      icon: IconUser,
+      icon: IconNotification,
     },
     {
       title: "Testimonial",
