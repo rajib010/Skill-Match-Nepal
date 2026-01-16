@@ -28,7 +28,6 @@ export async function getUserDetail(id: string): Promise<ApiResponse> {
             bio: true,
             experience: true,
             education: true,
-            cvUrl: true,
             skills: {
               select: {
                 id: true,

@@ -241,7 +241,7 @@ export default function ProfileClient({ user }: { user: UserData }) {
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-2xl font-bold">
-                  {user.name.charAt(0)}
+                  {user?.name?.charAt(0)}
                 </div>
                 <div>
                   <CardTitle className="text-2xl">{user.name}</CardTitle>

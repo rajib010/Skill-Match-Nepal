@@ -6,7 +6,7 @@ import { getUserDetail } from "./actions";
 export default async function ProfilePage() {
   const session = await getSignedInUser();
 
-  if (!session?.id) {
+  if (!session?.id || session.role !== "user") {
     redirect("/login");
   }
 

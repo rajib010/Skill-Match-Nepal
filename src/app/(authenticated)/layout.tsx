@@ -1,4 +1,4 @@
-import { isAuthenticated } from "@/lib/auth/server";
+import { getSignedInUser, isAuthenticated } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
@@ -12,6 +12,12 @@ export default async function AuthenticatedLayout({
 }) {
   if (!(await isAuthenticated())) {
     redirect("/login");
+  }
+
+  const user = await getSignedInUser();
+
+  if (user?.role && user.role !== "admin") {
+    redirect("/");
   }
 
   return (

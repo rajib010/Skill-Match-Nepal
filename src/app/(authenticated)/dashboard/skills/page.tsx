@@ -1,10 +1,10 @@
+// app/dashboard/skills/page.tsx
 import DropDownFilter from "../_components/dropdown-filter";
 import { ErrorDisplay } from "../_components/error-display";
 import { PaginationComponent } from "../_components/pagination-component";
 import SearchInput from "../_components/search-input";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { PlusIcon } from "lucide-react";
+import { SkillCards } from "./_components/skill-card";
+import { getAllSkills } from "./action";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;
@@ -12,11 +12,11 @@ interface iAppProps {
 
 const sortFields = [
   {
-    label: "Title",
-    key: "title",
+    label: "Skill Name",
+    key: "skillName",
     options: {
-      asc: "Title A-Z",
-      desc: "Title Z-A",
+      asc: "A-Z",
+      desc: "Z-A",
     },
   },
   {
@@ -29,10 +29,10 @@ const sortFields = [
   },
 ];
 
-export default async function Page({ searchParams }: iAppProps) {
+export default async function SkillsPage({ searchParams }: iAppProps) {
   const resolvedParams = await searchParams;
 
-  const limit = resolvedParams.limit ? Number(resolvedParams.limit) : 10;
+  const limit = resolvedParams.limit ? Number(resolvedParams.limit) : 12;
   const page = resolvedParams.page ? Number(resolvedParams.page) : 1;
   const search =
     typeof resolvedParams.search === "string"
@@ -42,41 +42,45 @@ export default async function Page({ searchParams }: iAppProps) {
   const sortOrder =
     resolvedParams.sort === "asc" || resolvedParams.sort === "desc"
       ? resolvedParams.sort
-      : "asc";
+      : "desc";
 
-  const sortField = ["title", "createdAt"].includes(
+  const sortField = ["skillName", "createdAt"].includes(
     resolvedParams.sortField as string
   )
-    ? (resolvedParams.sortField as "title" | "createdAt")
+    ? (resolvedParams.sortField as "skillName" | "level" | "createdAt")
     : "createdAt";
 
-  const res = await getAllJobs(page, limit, search, sortField, sortOrder);
+  // Fetch skills and profiles in parallel
+  const [skillsRes] = await Promise.all([
+    getAllSkills(page, limit, search, sortField, sortOrder),
+  ]);
 
-  if (!res.success) {
-    <ErrorDisplay message={res.message} />;
+  if (!skillsRes.success) {
+    return <ErrorDisplay message={skillsRes.message} />;
   }
 
-  const { jobs, currentPage, totalPages, hasNextPage, hasPreviousPage } =
-    res.data;
+  const { skills, currentPage, totalPages, hasNextPage, hasPreviousPage } =
+    skillsRes.data;
 
   return (
     <main className="main-page">
-      <h1 className="page-header">Skills Management Page</h1>
-      {/* button to open create DCR link */}
+      <h1 className="page-header">Skills Management</h1>
+
+      {/* Filters and Actions */}
       <div className="filters-wrapper">
-        <h2>
-          {search ? `Showing results for "${search}"` : "List of all skills"}
+        <h2 className="text-lg font-semibold">
+          {search
+            ? `Showing results for "${search}"`
+            : `All Skills (${skills.length})`}
         </h2>
-        <div className="flex items-center justify-between gap-2">
-          {/* add button */}
-          <Button asChild>
-            <Link href="/dashboard/users/add">
-              <PlusIcon /> Add Skills
-            </Link>
-          </Button>
-          {/* search */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          {/* Add Skills Button */}
+          {/* <SkillAddButton /> */}
+
+          {/* Search */}
           <SearchInput />
-          {/* filters */}
+
+          {/* Filters */}
           <DropDownFilter
             sortField={sortField}
             fields={sortFields}
@@ -85,12 +89,14 @@ export default async function Page({ searchParams }: iAppProps) {
           />
         </div>
       </div>
-      {/* table component */}
+
+      {/* Skills Cards */}
       <div className="flex-1 flex flex-col justify-between">
         <div className="overflow-auto">
-          <JobCards jobs={jobs} search={search} />
+          <SkillCards skills={skills} search={search} />
         </div>
-        {/* pagination component */}
+
+        {/* Pagination */}
         {totalPages > 1 && (
           <PaginationComponent
             currentPage={currentPage}
