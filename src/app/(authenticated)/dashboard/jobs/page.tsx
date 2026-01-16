@@ -4,9 +4,6 @@ import { PaginationComponent } from "../_components/pagination-component";
 import SearchInput from "../_components/search-input";
 import { getAllJobs } from "./action";
 import { JobCards } from "./_components/JobCards";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { PlusIcon } from "lucide-react";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;

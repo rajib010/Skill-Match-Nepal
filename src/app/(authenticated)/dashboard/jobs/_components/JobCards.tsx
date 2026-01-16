@@ -26,6 +26,7 @@ import { AlertModal } from "../../_components/alert-modal";
 import { JobDetailModal, RequirementType } from "./JobDetailModal";
 import { cn, formatDate } from "@/lib/utils";
 import { JobEditModal } from "./JobEditModal";
+import { toast } from "sonner";
 
 interface iAppProps {
   jobs: JobsType[];
@@ -128,7 +129,7 @@ export function JobCards({ jobs, search }: iAppProps) {
             <div className="mb-3">
               <Badge
                 variant={job.isActive ? "default" : "secondary"}
-                className="text-xs"
+                className="text-xs text-white"
               >
                 {job.isActive ? "Active" : "Inactive"}
               </Badge>
@@ -213,7 +214,12 @@ export function JobCards({ jobs, search }: iAppProps) {
           open={isDeleteModalOpen}
           onOpenChange={setIsDeleteModalOpen}
           action={async () => {
-            await deleteJob(selectedJob.id);
+            const res = await deleteJob(selectedJob.id);
+            if (!res.success) {
+              toast.error(res.message);
+              return;
+            }
+            toast.success(res.message);
             setIsDeleteModalOpen(false);
             setSelectedJob(null);
           }}
