@@ -143,7 +143,7 @@ export function AppSidebar({ ...props }) {
         </div>
         {isAdmin && (
           <div>
-            <span className="sidebar-header-text">Website Content</span>
+            <span className="sidebar-header-text">WEBSITE CONTENT</span>
             <NavMain items={websiteInformation} />
           </div>
         )}

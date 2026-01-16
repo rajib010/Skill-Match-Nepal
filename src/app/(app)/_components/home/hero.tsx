@@ -1,15 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useUser } from "@/context/useUser";
-import Link from "next/link";
 import React from "react";
 import Image from "next/image";
 import heroImage from "../../../../../public/home_hero.jpg";
+import { JobSearchInput } from "../../jobs/_components/job-search-input";
 
 export default function Hero() {
-  const { user } = useUser();
-
   return (
     <section className="relative flex flex-col items-center justify-center bg-gradient-hero min-h-screen overflow-hidden">
       <div className="absolute inset-0 opacity-80">
@@ -32,19 +28,7 @@ export default function Hero() {
             available in Nepal.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in fade-in slide-in-from-bottom-6 duration-1000 delay-300">
-            {!user && (
-              <Button size="lg" asChild className="text-lg px-8">
-                <Link href="/login">Get Started</Link>
-              </Button>
-            )}
-            <Button
-              size="lg"
-              variant="outline"
-              asChild
-              className="bg-transparent text-primary hover:text-white hover:bg-primary text-lg px-8"
-            >
-              <Link href="/jobs">Browse Jobs</Link>
-            </Button>
+            <JobSearchInput autoFocus={false} />
           </div>
         </div>
       </div>

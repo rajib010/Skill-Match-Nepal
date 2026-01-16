@@ -32,20 +32,20 @@ model User {
 }
 
 model UserProfile {
-  id          String   @id @default(cuid())
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  phone       String?
-  location    String?
-  bio         String?  @db.Text
-  experience  String?  @db.Text
-  education   String?  @db.Text
-  
-  skills      UserSkill[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  phone      String?
+  location   String?
+  bio        String? @db.Text
+  experience String? @db.Text
+  education  String? @db.Text
+
+  skills UserSkill[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("user_profile")
 }
@@ -54,11 +54,11 @@ model UserSkill {
   id        String      @id @default(cuid())
   profileId String
   profile   UserProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  
+
   skillName String
-  level     String?     // beginner, intermediate, expert
-  
-  createdAt DateTime    @default(now())
+  level     String? // beginner, intermediate, expert
+
+  createdAt DateTime @default(now())
 
   @@unique([profileId, skillName])
   @@index([skillName])
@@ -66,53 +66,53 @@ model UserSkill {
 }
 
 model Category {
-  id          String   @id @default(cuid())
-  name        String   @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String?
-  slug        String   @unique
-  
-  jobs        Job[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  slug        String  @unique
+
+  jobs Job[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("category")
 }
 
 model Job {
-  id          String   @id @default(cuid())
+  id          String  @id @default(cuid())
   title       String
-  description String   @db.Text
+  description String  @db.Text
   company     String
   location    String
   salary      String?
-  jobType     String   // full-time, part-time, contract, internship
-  
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
-  isActive    Boolean  @default(true)
-  expiresAt   DateTime?
-  
+  jobType     String // full-time, part-time, contract, internship
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+
   requirements JobRequirement[]
   applications JobApplication[]
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([categoryId, isActive])
   @@map("job")
 }
 
 model JobRequirement {
-  id         String   @id @default(cuid())
-  jobId      String
-  job        Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
-  skillName  String
-  required   Boolean  @default(true) // required vs preferred
-  
-  createdAt  DateTime @default(now())
+  id    String @id @default(cuid())
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  skillName String
+  required  Boolean @default(true) // required vs preferred
+
+  createdAt DateTime @default(now())
 
   @@unique([jobId, skillName])
   @@index([skillName])
@@ -120,23 +120,33 @@ model JobRequirement {
 }
 
 model JobApplication {
-  id        String   @id @default(cuid())
-  jobId     String
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  matchScore Float    // 0-100 score from keyword matching
-  status     String   @default("pending") // pending, reviewed, accepted, rejected
-    
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id    String @id @default(cuid())
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  matchScore Float // 0-100 score from keyword matching
+  status     String @default("pending") // pending, reviewed, accepted, rejected
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([jobId, userId])
   @@index([userId, status])
   @@index([jobId, matchScore])
   @@map("job_application")
+}
+
+model SearchQuery {
+  id           String   @id @default(cuid())
+  query        String
+  resultsCount Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([query, createdAt])
+  @@index([createdAt])
 }
 
 model Session {

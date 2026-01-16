@@ -379,6 +379,123 @@ export async function getUserApplications(
   }
 }
 
+export async function trackSearchQuery(
+  query: string,
+  userId: string | null,
+  resultsCount: number
+) {
+  try {
+    await prisma.searchQuery.create({
+      data: {
+        query: query.trim().toLowerCase(),
+        resultsCount,
+      },
+    });
+  } catch (error) {
+    console.error("Error tracking search query:", error);
+    // Don't throw - tracking should not break the search
+  }
+}
+
+
+export async function getTopSearches(limit: number = 10, days: number = 30) {
+  try {
+    const dateFrom = new Date();
+    dateFrom.setDate(dateFrom.getDate() - days);
+
+    // Group by query and count occurrences
+    const topSearches = await prisma.searchQuery.groupBy({
+      by: ["query"],
+      where: {
+        createdAt: {
+          gte: dateFrom,
+        },
+      },
+      _count: {
+        query: true,
+      },
+      orderBy: {
+        _count: {
+          query: "desc",
+        },
+      },
+      take: limit,
+    });
+
+    return topSearches.map((search) => ({
+      query: search.query,
+      searchCount: search._count.query,
+    }));
+  } catch (error) {
+    console.error("Error fetching top searches:", error);
+    return [];
+  }
+}
+
+export async function getTrendingSearches(limit: number = 10) {
+  try {
+    const now = new Date();
+    const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const previous7Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+
+    // Get searches from last 7 days
+    const recentSearches = await prisma.searchQuery.groupBy({
+      by: ["query"],
+      where: {
+        createdAt: {
+          gte: last7Days,
+        },
+      },
+      _count: {
+        query: true,
+      },
+    });
+
+    // Get searches from previous 7 days
+    const previousSearches = await prisma.searchQuery.groupBy({
+      by: ["query"],
+      where: {
+        createdAt: {
+          gte: previous7Days,
+          lt: last7Days,
+        },
+      },
+      _count: {
+        query: true,
+      },
+    });
+
+    // Calculate growth rate
+    const previousMap = new Map(
+      previousSearches.map((s) => [s.query, s._count.query])
+    );
+
+    const trending = recentSearches
+      .map((recent) => {
+        const recentCount = recent._count.query;
+        const previousCount = previousMap.get(recent.query) || 0;
+        const growthRate =
+          previousCount === 0
+            ? recentCount
+            : ((recentCount - previousCount) / previousCount) * 100;
+
+        return {
+          query: recent.query,
+          searchCount: recentCount,
+          growthRate,
+        };
+      })
+      .filter((item) => item.growthRate > 0)
+      .sort((a, b) => b.growthRate - a.growthRate)
+      .slice(0, limit);
+
+    return trending;
+  } catch (error) {
+    console.error("Error fetching trending searches:", error);
+    return [];
+  }
+}
+
 export type UserJobsType = Awaited<
   ReturnType<typeof getActiveJobs>
 >["data"]["jobs"];
