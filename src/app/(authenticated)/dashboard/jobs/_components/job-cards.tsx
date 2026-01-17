@@ -23,9 +23,9 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useState } from "react";
 import { AlertModal } from "../../_components/alert-modal";
-import { JobDetailModal, RequirementType } from "./JobDetailModal";
+import { JobDetailModal, RequirementType } from "./job-detail-modal";
 import { cn, formatDate } from "@/lib/utils";
-import { JobEditModal } from "./JobEditModal";
+import { JobEditModal } from "./job-edit-modal";
 import { toast } from "sonner";
 
 interface iAppProps {
@@ -175,7 +175,7 @@ export function JobCards({ jobs, search }: iAppProps) {
 
             {/* Requirements */}
             {job.requirements.length > 0 && (
-              <div className="mb-3">
+              <div className="mb-3 h-17">
                 <p className="text-xs text-gray-500 mb-2">Required Skills:</p>
                 <div className="flex flex-wrap gap-1.5">
                   {job.requirements.slice(0, 3).map((req: RequirementType) => (

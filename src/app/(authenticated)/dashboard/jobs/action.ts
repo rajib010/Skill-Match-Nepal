@@ -3,6 +3,7 @@
 import { prisma } from "@/database/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { jobSchema, JobSchemaType } from "./schema";
 
 export async function getAllJobs(
   page: number = 1,
@@ -208,32 +209,45 @@ export async function updateJob(
   }
 }
 
-export async function createJob(data: {
-  title: string;
-  description: string;
-  company: string;
-  location: string;
-  salary?: string;
-  jobType: string;
-  categoryId: string;
-  postedById: string;
-  isActive?: boolean;
-  expiresAt?: Date;
-  requirements: Array<{ skillName: string; required: boolean }>;
-}): Promise<ApiResponse> {
+export async function createJob(data: JobSchemaType): Promise<ApiResponse> {
   try {
-    const { requirements, ...jobData } = data;
+    const validatedData = jobSchema.safeParse(data);
 
-    const job = await prisma.job.create({
+    if (!validatedData.success) {
+      return {
+        success: false,
+        message: "Invalid data provided.",
+      };
+    }
+
+    const {
+      title,
+      location,
+      company,
+      description,
+      isActive,
+      jobType,
+      salary,
+      categoryId,
+      requirements,
+    } = validatedData.data;
+
+    await prisma.job.create({
       data: {
-        ...jobData,
+        title,
+        description,
+        location,
+        company,
+        jobType,
+        isActive,
+        salary,
+        categoryId,
         requirements: {
-          create: requirements,
+          create: requirements.map((req) => ({
+            skillName: req.skillName,
+            required: req.required || true,
+          })),
         },
-      },
-      include: {
-        category: true,
-        requirements: true,
       },
     });
 
@@ -242,13 +256,11 @@ export async function createJob(data: {
     return {
       success: true,
       message: "Job created successfully.",
-      data: job,
     };
   } catch (error: unknown) {
-    let message = "Failed to create job.";
-    if (error instanceof Error) message = error.message;
+    console.log("🚀 ~ createJob ~ error:", error);
 
-    return { success: false, message, data: null };
+    return { success: false, message: "Failed to create job.", data: null };
   }
 }
 

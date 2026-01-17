@@ -213,6 +213,29 @@ export async function deleteCategory(id: string): Promise<ApiResponse> {
   }
 }
 
+export async function getMinimalCategories(): Promise<ApiResponse> {
+  try {
+    const categories = await prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    return {
+      success: true,
+      message: "All Categories fetched successfully.",
+      data: categories,
+    };
+  } catch (error) {
+    console.log("🚀 ~ getMinimalCategories ~ error:", error);
+    return {
+      success: false,
+      message: "Failed to fetch categories.",
+    };
+  }
+}
+
 export type CategoryType = NonNullable<
   Awaited<ReturnType<typeof getAllCategory>>
 >["data"];

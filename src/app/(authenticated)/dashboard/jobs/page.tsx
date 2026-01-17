@@ -3,7 +3,7 @@ import { ErrorDisplay } from "../_components/error-display";
 import { PaginationComponent } from "../_components/pagination-component";
 import SearchInput from "../_components/search-input";
 import { getAllJobs } from "./action";
-import { JobCards } from "./_components/JobCards";
+import { JobCards } from "./_components/job-cards";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
@@ -75,7 +75,7 @@ export default async function Page({ searchParams }: iAppProps) {
             href={"/dashboard/jobs/add"}
             className={buttonVariants({ variant: "default" })}
           >
-            Add New <PlusIcon />
+            <PlusIcon /> Add Job
           </Link>
           {/* search */}
           <SearchInput />

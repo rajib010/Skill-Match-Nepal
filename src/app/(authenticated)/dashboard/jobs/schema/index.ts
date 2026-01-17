@@ -9,6 +9,19 @@ export const jobSchema = z.object({
   salary: z.string().optional(),
   jobType: z.string().min(1, "Please select the job type."),
   isActive: z.boolean(),
+  categoryId: z
+    .string()
+    .trim()
+    .min(1, "Please select a category.")
+    .max(100, "Max. 100 characters allowed."),
+  requirements: z
+    .array(
+      z.object({
+        skillName: z.string().min(1, "Skill name is required."),
+        required: z.boolean(),
+      })
+    )
+    .min(1, "At least one skill is required."),
 });
 
 export type JobSchemaType = z.infer<typeof jobSchema>;

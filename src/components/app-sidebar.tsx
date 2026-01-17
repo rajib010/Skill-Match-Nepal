@@ -9,6 +9,8 @@ import {
   IconUserBitcoin,
   IconPhoneCall,
   IconNotification,
+  IconBriefcase,
+  IconCategory,
 } from "@tabler/icons-react";
 import { NavMain } from "@/components/nav-main";
 import {
@@ -53,12 +55,12 @@ export function AppSidebar({ ...props }) {
     {
       title: "Jobs",
       url: "/dashboard/jobs",
-      icon: IconHome,
+      icon: IconBriefcase,
     },
     {
       title: "Categories",
       url: "/dashboard/categories",
-      icon: IconHome,
+      icon: IconCategory,
     },
   ];
 

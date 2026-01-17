@@ -18,6 +18,7 @@ import {
   IconUsers,
   IconFileText,
 } from "@tabler/icons-react";
+import { RenderDescription } from "@/app/(authenticated)/_components/rich-text/RenderDescription";
 
 interface iAppProps {
   isOpen: boolean;
@@ -37,6 +38,21 @@ export const JobDetailModal = memo(function JobDetailModal({
   job,
 }: iAppProps) {
   if (!isOpen) return null;
+
+  const parsed = (() => {
+    try {
+      // Try to parse the description as JSON
+      const parsed = JSON.parse(job.description);
+      return <RenderDescription json={parsed} />;
+    } catch {
+      // If parsing fails, it's plain text
+      return (
+        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+          {job.description}
+        </p>
+      );
+    }
+  })();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -151,9 +167,15 @@ export const JobDetailModal = memo(function JobDetailModal({
                 Job Description
               </h3>
             </div>
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {job.description}
-            </p>
+
+            {/* {typeof job.description === "string" ? (
+              <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                {job.description}
+              </p>
+            ) : (
+              <RenderDescription json={job.description} />
+            )} */}
+            {parsed}
           </div>
 
           {/* Requirements */}
