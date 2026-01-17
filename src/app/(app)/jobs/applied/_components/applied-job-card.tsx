@@ -1,11 +1,34 @@
 import React from "react";
 import { AppliedJobType } from "../../actions";
-import { IconArrowRight, IconBriefcase, IconBuilding, IconCalendar, IconClock, IconCurrencyDollar, IconMapPin } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconBriefcase,
+  IconBuilding,
+  IconCalendar,
+  IconClock,
+  IconCurrencyDollar,
+  IconMapPin,
+} from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { RequirementType } from "@/app/(authenticated)/dashboard/jobs/_components/job-detail-modal";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+
+function statusColor(status: string) {
+  switch (status) {
+    case "pending":
+      return "text-yellow-500 bg-yellow-50";
+    case "reviewed":
+      return "text-blue-500 bg-blue-50";
+    case "accepted":
+      return "text-green-600 bg-green-50";
+    case "rejected":
+      return "text-red-500 bg-red-50";
+    default:
+      return "text-gray-500 bg-gray-50";
+  }
+}
 
 export default function AppliedJobCards({
   jobs,
@@ -28,7 +51,6 @@ export default function AppliedJobCards({
     );
   }
 
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {jobs.map((item) => {
@@ -38,9 +60,12 @@ export default function AppliedJobCards({
             className="bg-white rounded-lg p-5 hover:shadow-lg transition-all duration-200 flex flex-col"
           >
             {/* Category Badge */}
-            <div className="mb-3">
+            <div className="mb-3 flex justify-between w-full">
               <Badge variant="default" className="text-xs text-white">
                 {item.job.category.name}
+              </Badge>
+              <Badge className={cn(statusColor(item.status))}>
+                {item.status.toUpperCase()}
               </Badge>
             </div>
 
@@ -83,15 +108,17 @@ export default function AppliedJobCards({
               <div className="mb-4">
                 <p className="text-xs text-gray-500 mb-2">Required Skills:</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {item.job.requirements.slice(0, 3).map((req: RequirementType) => (
-                    <Badge
-                      key={req.id}
-                      variant="secondary"
-                      className="text-xs px-2 py-0.5"
-                    >
-                      {req.skillName}
-                    </Badge>
-                  ))}
+                  {item.job.requirements
+                    .slice(0, 3)
+                    .map((req: RequirementType) => (
+                      <Badge
+                        key={req.id}
+                        variant="secondary"
+                        className="text-xs px-2 py-0.5"
+                      >
+                        {req.skillName}
+                      </Badge>
+                    ))}
                   {item.job.requirements.length > 3 && (
                     <Badge variant="secondary" className="text-xs px-2 py-0.5">
                       +{item.job.requirements.length - 3} more

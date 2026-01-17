@@ -24,3 +24,22 @@ export const categoryTableHeaders = [
   },
   { key: "actions", label: "Actions", classname: "text-center" },
 ];
+
+export const applicationTableHeaders = [
+  { key: "sn", label: "SN", classname: "text-center" },
+  { key: "user.name", label: "User" },
+  {
+    key: "job.title",
+    label: "Title",
+    classname: "max-w-[100px] overflow-x-scroll",
+  },
+  {
+    key: "job.company",
+    label: "Company",
+    classname: "max-w-[100px] overflow-x-scroll",
+  },
+  { key: "job.jobType", label: "Job Type" },
+  { key: "matchScore", label: "Match Score" },
+
+  { key: "actions", label: "Actions", classname: "text-center" },
+];

@@ -11,6 +11,7 @@ import {
   IconNotification,
   IconBriefcase,
   IconCategory,
+  IconMail,
 } from "@tabler/icons-react";
 import { NavMain } from "@/components/nav-main";
 import {
@@ -48,9 +49,14 @@ export function AppSidebar({ ...props }) {
       icon: IconHome,
     },
     {
-      title: "Users",
-      url: "/dashboard/users",
-      icon: IconUserBitcoin,
+      title: "Applications",
+      url: "/dashboard/applications",
+      icon: IconMail,
+    },
+    {
+      title: "Categories",
+      url: "/dashboard/categories",
+      icon: IconCategory,
     },
     {
       title: "Jobs",
@@ -58,9 +64,9 @@ export function AppSidebar({ ...props }) {
       icon: IconBriefcase,
     },
     {
-      title: "Categories",
-      url: "/dashboard/categories",
-      icon: IconCategory,
+      title: "Users",
+      url: "/dashboard/users",
+      icon: IconUserBitcoin,
     },
   ];
 

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AppliedJobCards from "./_components/applied-job-card";
 import DropDownFilter from "@/app/(authenticated)/dashboard/_components/dropdown-filter";
 import SearchInput from "@/app/(authenticated)/dashboard/_components/search-input";
+import { PaginationComponent } from "@/app/(authenticated)/dashboard/_components/pagination-component";
 
 const sortFields = [
   {
@@ -66,6 +67,7 @@ export default async function JobDetailPage({ searchParams }: iAppProps) {
   );
 
   const jobs = res.success ? res.data.appliedJobs : [];
+  const { totalPages, hasNextPage, hasPreviousPage } = res.data;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -85,7 +87,9 @@ export default async function JobDetailPage({ searchParams }: iAppProps) {
         </div>
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-900">
-            {search?.trim() ? `Showing results for "${search}"` : "Showing all of your applied jobs"}
+            {search?.trim()
+              ? `Showing results for "${search}"`
+              : "Showing all of your applied jobs"}
           </h2>
         </div>
 
@@ -93,6 +97,18 @@ export default async function JobDetailPage({ searchParams }: iAppProps) {
         <div className="mb-8">
           <AppliedJobCards jobs={jobs} />
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center">
+            <PaginationComponent
+              currentPage={page}
+              hasNextPage={hasNextPage}
+              hasPreviousPage={hasPreviousPage}
+              totalpages={totalPages}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

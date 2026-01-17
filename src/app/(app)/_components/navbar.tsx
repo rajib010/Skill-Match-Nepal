@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, Briefcase } from "lucide-react";
 import UserImage from "@/app/(authenticated)/dashboard/_components/user-image";
 import { toast } from "sonner";
 import { signOut } from "@/lib/auth/client";
@@ -68,7 +68,7 @@ export default function Navbar() {
                     <UserImage />
                   </DropdownMenuTrigger>
 
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="center" className="w-40">
                     <DropdownMenuItem asChild>
                       <Link
                         href={isAdmin ? "/dashboard" : "/profile"}
@@ -79,6 +79,14 @@ export default function Navbar() {
                       </Link>
                     </DropdownMenuItem>
 
+                    <DropdownMenuSeparator />
+                    {!isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link href={"/jobs/applied"} className="cursor-pointer">
+                          <Briefcase /> <span className="ml-2">Applied Jobs</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuSeparator />
 
                     <DropdownMenuItem

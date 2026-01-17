@@ -1,10 +1,10 @@
 import React from "react";
-import { PersonStandingIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import { UserJobCards } from "../../jobs/_components/user-job-cards";
+import { UserJobsType } from "../../jobs/actions";
 
-export default function TopJobs() {
+export default function TopJobs({ jobs }: { jobs: UserJobsType }) {
   return (
     <section className="py-8 bg-background">
       <div className="container mx-auto px-4">
@@ -27,17 +27,7 @@ export default function TopJobs() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <Card className="border-2 hover:border-primary transition-colors">
-            <CardContent className="pt-6">
-              <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <PersonStandingIcon className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">title</h3>
-              <p className="text-muted-foreground">Description</p>
-            </CardContent>
-          </Card>
-        </div>
+        <UserJobCards jobs={jobs} />
       </div>
     </section>
   );

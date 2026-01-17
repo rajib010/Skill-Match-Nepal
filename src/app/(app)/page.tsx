@@ -5,6 +5,8 @@ import TopJobs from "./_components/home/top-jobs";
 import { getAllTestimonials } from "../(authenticated)/dashboard/testimonials/action";
 import TestimonialWrapper from "./_components/home/testimonials";
 import FAQ from "./_components/home/faq";
+import { getActiveJobs } from "./jobs/actions";
+import { getSignedInUser } from "@/lib/auth/server";
 
 const features = [
   {
@@ -31,17 +33,33 @@ const features = [
 ];
 
 export default async function Page() {
-  const testimonialResponse = await getAllTestimonials();
+  const user = await getSignedInUser();
+  const [testimonialResponse, topJobResponse] = await Promise.all([
+    getAllTestimonials(),
+    getActiveJobs(
+      1,
+      3,
+      undefined,
+      "matchScore",
+      "desc",
+      undefined,
+      undefined,
+      undefined,
+      user?.id
+    ),
+  ]);
   const testimonials = testimonialResponse.success
     ? testimonialResponse.data.testimonials
     : [];
+
+  const topJobs = topJobResponse.success ? topJobResponse.data.jobs : [];
 
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <Hero />
 
-      <TopJobs />
+      <TopJobs jobs={topJobs} />
 
       {/* Features Section */}
       <Features features={features} />
@@ -49,7 +67,6 @@ export default async function Page() {
       <TestimonialWrapper testimonials={testimonials} />
 
       <FAQ />
-
     </div>
   );
 }

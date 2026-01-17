@@ -5,6 +5,7 @@ import DropDownFilter from "@/app/(authenticated)/dashboard/_components/dropdown
 import { UserJobCards } from "./_components/user-job-cards";
 import { PaginationComponent } from "@/app/(authenticated)/dashboard/_components/pagination-component";
 import { CategoryFilter } from "./_components/category-filter";
+import { getSignedInUser } from "@/lib/auth/server";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;
@@ -12,11 +13,11 @@ interface iAppProps {
 
 const sortFields = [
   {
-    label: "Title",
-    key: "title",
+    label: "Match Score",
+    key: "matchScore",
     options: {
-      asc: "Title A-Z",
-      desc: "Title Z-A",
+      asc: "Lowest Match",
+      desc: "Highest Match",
     },
   },
   {
@@ -44,11 +45,11 @@ export default async function JobsPage({ searchParams }: iAppProps) {
       ? resolvedParams.sort
       : "desc";
 
-  const sortField = ["title", "createdAt"].includes(
+  const sortField = ["createdAt", "matchScore"].includes(
     resolvedParams.sortField as string
   )
-    ? (resolvedParams.sortField as "title" | "createdAt")
-    : "createdAt";
+    ? (resolvedParams.sortField as "createdAt" | "matchScore")
+    : "matchScore";
 
   const categoryId =
     typeof resolvedParams.category === "string"
@@ -65,6 +66,9 @@ export default async function JobsPage({ searchParams }: iAppProps) {
       ? resolvedParams.location
       : undefined;
 
+  const user = await getSignedInUser();
+  const userId = user?.id;
+
   // Fetch jobs and categories in parallel
   const [jobsRes, categoriesRes] = await Promise.all([
     getActiveJobs(
@@ -75,7 +79,8 @@ export default async function JobsPage({ searchParams }: iAppProps) {
       sortOrder,
       categoryId,
       jobType,
-      location
+      location,
+      userId
     ),
     getCategories(),
   ]);

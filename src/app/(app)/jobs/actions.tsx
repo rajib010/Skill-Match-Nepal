@@ -8,19 +8,17 @@ export async function getActiveJobs(
   page: number = 1,
   limit: number = 12,
   search?: string,
-  sortField?: "title" | "createdAt" | "salary",
+  sortField?: "createdAt" | "matchScore",
   sortOrder?: "asc" | "desc",
   categoryId?: string,
   jobType?: string,
-  location?: string
+  location?: string,
+  userId?: string
 ): Promise<ApiResponse> {
   try {
-    const skip = (page - 1) * limit;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const whereClause: Prisma.JobWhereInput | any = {
-      isActive: true, // Only show active jobs to users
-      // Optionally filter expired jobs
+      isActive: true,
       OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
     };
 
@@ -32,6 +30,7 @@ export async function getActiveJobs(
             { title: { contains: search, mode: "insensitive" as const } },
             { location: { contains: search, mode: "insensitive" as const } },
             { description: { contains: search, mode: "insensitive" as const } },
+            { company: { contains: search, mode: "insensitive" as const } },
           ],
         },
       ];
@@ -52,16 +51,36 @@ export async function getActiveJobs(
       };
     }
 
-    const orderByClause = sortField
-      ? { [sortField]: sortOrder || "desc" }
-      : { createdAt: "desc" as const };
+    // Get user skills only if userId is provided
+    let userSkills: string[] = [];
+    if (userId) {
+      const userProfile = await prisma.userProfile.findUnique({
+        where: { userId },
+        include: {
+          skills: true,
+        },
+      });
+
+      if (userProfile) {
+        userSkills = userProfile.skills.map((s) => s.skillName.toLowerCase());
+      }
+    }
+
+    // If sorting by matchScore, fetch ALL jobs 
+    const shouldFetchAll = sortField === "matchScore" && userId;
+
+    const skip = shouldFetchAll ? undefined : (page - 1) * limit;
+    const take = shouldFetchAll ? undefined : limit;
 
     const [jobs, totalCount] = await Promise.all([
       prisma.job.findMany({
         where: whereClause,
         skip,
-        take: limit,
-        orderBy: orderByClause,
+        take,
+        orderBy:
+          !shouldFetchAll && sortField === "createdAt"
+            ? { createdAt: sortOrder || "desc" }
+            : undefined,
         include: {
           category: {
             select: {
@@ -82,10 +101,85 @@ export async function getActiveJobs(
               applications: true,
             },
           },
+          applications: userId
+            ? {
+                where: { userId },
+                select: {
+                  id: true,
+                  status: true,
+                  matchScore: true,
+                  createdAt: true,
+                },
+              }
+            : false,
         },
       }),
       prisma.job.count({ where: whereClause }),
     ]);
+
+    // Calculate match scores for each job
+    const jobsWithMatchScore = jobs.map((job) => {
+      let matchScore = 0;
+
+      if (userId && userSkills.length > 0 && job.requirements.length > 0) {
+        const requiredSkills = job.requirements.filter((r) => r.required);
+        const preferredSkills = job.requirements.filter((r) => !r.required);
+
+        let matchedRequired = 0;
+        let matchedPreferred = 0;
+
+        requiredSkills.forEach((req) => {
+          if (userSkills.includes(req.skillName.toLowerCase())) {
+            matchedRequired++;
+          }
+        });
+
+        preferredSkills.forEach((req) => {
+          if (userSkills.includes(req.skillName.toLowerCase())) {
+            matchedPreferred++;
+          }
+        });
+
+        // Calculate score: 70% weight for required, 30% for preferred
+        const requiredScore =
+          requiredSkills.length > 0
+            ? (matchedRequired / requiredSkills.length) * 70
+            : 70;
+
+        const preferredScore =
+          preferredSkills.length > 0
+            ? (matchedPreferred / preferredSkills.length) * 30
+            : 30;
+
+        matchScore = Math.round(requiredScore + preferredScore);
+      }
+
+      return {
+        ...job,
+        matchScore,
+        hasApplied: userId ? job.applications.length > 0 : false,
+        applicationStatus:
+          userId && job.applications.length > 0
+            ? job.applications[0].status
+            : null,
+      };
+    });
+
+    let finalJobs = jobsWithMatchScore;
+
+    if (sortField === "matchScore" && userId) {
+      // Sort by match score
+      finalJobs = jobsWithMatchScore.sort((a, b) => {
+        return sortOrder === "asc"
+          ? a.matchScore - b.matchScore
+          : b.matchScore - a.matchScore;
+      });
+
+      // Apply pagination AFTER sorting
+      const windowStart = (page - 1) * limit;
+      const windowEnd = windowStart + limit;
+      finalJobs = finalJobs.slice(windowStart, windowEnd);
+    }
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -93,7 +187,7 @@ export async function getActiveJobs(
       success: true,
       message: "Jobs fetched successfully.",
       data: {
-        jobs,
+        jobs: finalJobs,
         currentPage: page,
         totalPages,
         totalCount,
@@ -292,6 +386,13 @@ export async function applyForJob(
 export async function getCategories(): Promise<ApiResponse> {
   try {
     const categories = await prisma.category.findMany({
+      where: {
+        jobs: {
+          some: {
+            isActive: true, //categories with at least one job
+          },
+        },
+      },
       orderBy: {
         name: "asc",
       },
