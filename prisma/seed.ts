@@ -509,6 +509,46 @@ async function main() {
   }
   console.log(`✅ ${totalApplications} job applications created`);
 
+  //7. add faqs
+
+  const faqs = [
+    {
+      question: "What is Skill Match Nepal?",
+      answer:
+        "Skill Match Nepal is an online job recommendation platform that helps users find suitable jobs based on their skills. The system matches the skills added in a user’s profile with the required and preferred skills listed in jobs posted by the admin, and then recommends the most relevant jobs.",
+      position: 0,
+    },
+    {
+      question: "How does Skill Match Nepal recommend jobs?",
+      answer:
+        "The system compares the skills entered by the user with the required and preferred skills mentioned in each job post. Jobs with the highest number of matching skills are shown as recommendations, helping users quickly find jobs that fit their abilities.",
+      position: 1,
+    },
+    {
+      question:
+        "Do I need to add skills to my profile to get job recommendations?",
+      answer:
+        "Yes. Adding skills to your profile is necessary for accurate job recommendations. The more relevant and updated your skills are, the better the system can match you with suitable job opportunities.",
+      position: 2,
+    },
+    {
+      question: "Who posts the jobs on Skill Match Nepal?",
+      answer:
+        "All jobs on Skill Match Nepal are posted by the admin. Each job includes details such as job title, description, required skills, and preferred skills, which are used by the system to match users with appropriate jobs.",
+      position: 3,
+    },
+    {
+      question: "Can I update my skills after creating my profile?",
+      answer:
+        "Yes. Users can update their skills at any time. Once the skills are updated, the system automatically adjusts the job recommendations based on the new information.",
+      position: 4,
+    },
+  ];
+
+for (const faq of faqs) {
+  await prisma.faq.create({ data: faq });
+}
+
   // 7. Verify final results
   console.log("\n🔍 Verifying results...");
   const finalUserCount = await prisma.user.count();
@@ -521,6 +561,7 @@ async function main() {
   const userSkillCount = await prisma.userSkill.count();
   const jobRequirementCount = await prisma.jobRequirement.count();
   const applicationCount = await prisma.jobApplication.count();
+  const faqsCount = await prisma.faq.count();
 
   console.log("\n🎉 Database seeding completed successfully!");
   console.log("\n📋 Summary:");
@@ -533,6 +574,7 @@ async function main() {
   console.log(`- User Skills: ${userSkillCount}`);
   console.log(`- Job Requirements: ${jobRequirementCount}`);
   console.log(`- Job Applications: ${applicationCount}`);
+  console.log("-FaqsCount:", faqsCount);
 
   console.log("\n🔑 Login Credentials:");
   console.log("👑 Admin: admin@skillmatch.com / Admin@123");

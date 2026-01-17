@@ -1,10 +1,10 @@
 import { ErrorDisplay } from "@/app/(authenticated)/dashboard/_components/error-display";
-import { getActiveJobs, getCategories } from "./actions";
+import { CategoriesType, getActiveJobs, getCategories } from "./actions";
 import SearchInput from "@/app/(authenticated)/dashboard/_components/search-input";
 import DropDownFilter from "@/app/(authenticated)/dashboard/_components/dropdown-filter";
 import { UserJobCards } from "./_components/user-job-cards";
 import { PaginationComponent } from "@/app/(authenticated)/dashboard/_components/pagination-component";
-
+import { CategoryFilter } from "./_components/category-filter";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;
@@ -17,14 +17,6 @@ const sortFields = [
     options: {
       asc: "Title A-Z",
       desc: "Title Z-A",
-    },
-  },
-  {
-    label: "Company",
-    key: "company",
-    options: {
-      asc: "Company A-Z",
-      desc: "Company Z-A",
     },
   },
   {
@@ -52,10 +44,10 @@ export default async function JobsPage({ searchParams }: iAppProps) {
       ? resolvedParams.sort
       : "desc";
 
-  const sortField = ["title", "company", "createdAt"].includes(
+  const sortField = ["title", "createdAt"].includes(
     resolvedParams.sortField as string
   )
-    ? (resolvedParams.sortField as "title" | "company" | "createdAt")
+    ? (resolvedParams.sortField as "title" | "createdAt")
     : "createdAt";
 
   const categoryId =
@@ -101,67 +93,59 @@ export default async function JobsPage({ searchParams }: iAppProps) {
     hasPreviousPage,
   } = jobsRes.data;
 
-  const categories = categoriesRes.success ? categoriesRes.data : [];
+  const categories: CategoriesType[] = categoriesRes.success
+    ? categoriesRes.data
+    : [];
 
   return (
     <main className="min-h-screen bg-gray-50">
-     
-      
-
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         {/* Filters Section */}
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <SearchInput  />
-            </div>
+        <div className=" flex flex-wrap justify-end gap-3">
+          <SearchInput />
 
-            {/* Category Filter */}
-            {/* // <CategoryFilter categories={categories || []} /> */}
+          <CategoryFilter categories={categories || []} />
 
-            {/* Job Type Filter */}
-            {/* // <JobTypeFilter /> */}
+          {/* // <JobTypeFilter /> */}
 
-            {/* Sort */}
-            <DropDownFilter
-              sortField={sortField}
-              fields={sortFields}
-              search={search}
-              sortOrder={sortOrder}
-            />
-          </div>
-
-          {/* Active Filters Display */}
-          {(search || categoryId || jobType) && (
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-600">
-                {search && (
-                  <span>
-                    Searching for: <strong>&quot;{search}&quot;</strong>
-                  </span>
-                )}
-                {categoryId && categories && (
-                  <span className="ml-3">
-                    Category:{" "}
-                    <strong>
-                      {categories.find((c) => c.id === categoryId)?.name}
-                    </strong>
-                  </span>
-                )}
-                {jobType && (
-                  <span className="ml-3">
-                    Type:{" "}
-                    <strong className="capitalize">
-                      {jobType.replace("-", " ")}
-                    </strong>
-                  </span>
-                )}
-              </p>
-            </div>
-          )}
+          {/* Sort */}
+          <DropDownFilter
+            sortField={sortField}
+            fields={sortFields}
+            search={search}
+            sortOrder={sortOrder}
+          />
         </div>
+        {/* Active Filters Display */}
+
+        {(search || categoryId || jobType) && (
+          <div className="my-4">
+            <p className="text-sm text-gray-600">
+              {search && (
+                <span>
+                  Searching for: <strong>&quot;{search}&quot;</strong>
+                </span>
+              )}
+              {categoryId && categories && (
+                <span className="">
+                  Category:{" "}
+                  <strong>
+                    {categories.find((c) => c.id === categoryId)?.name}
+                  </strong>
+                </span>
+              )}
+              {jobType && (
+                <span className="">
+                  Type:{" "}
+                  <strong className="capitalize">
+                    {jobType.replace("-", " ")}
+                  </strong>
+                </span>
+              )}
+            </p>
+          </div>
+        )}
 
         {/* Results Count */}
         <div className="mb-6">

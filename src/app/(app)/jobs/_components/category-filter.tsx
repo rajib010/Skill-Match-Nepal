@@ -36,10 +36,10 @@ export function CategoryFilter({ categories }: iAppProps) {
 
   return (
     <Select value={currentCategory} onValueChange={handleCategoryChange}>
-      <SelectTrigger className="w-full md:w-[200px] cursor-pointer">
+      <SelectTrigger className="bg-white cursor-pointer">
         <SelectValue placeholder="All Categories" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="max-h-[300]">
         <SelectItem value="all">All Categories</SelectItem>
         {categories?.map((category) => (
           <SelectItem key={category.id} value={category.id}>

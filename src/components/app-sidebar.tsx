@@ -55,6 +55,11 @@ export function AppSidebar({ ...props }) {
       url: "/dashboard/jobs",
       icon: IconHome,
     },
+    {
+      title: "Categories",
+      url: "/dashboard/categories",
+      icon: IconHome,
+    },
   ];
 
   const navPreferences = [

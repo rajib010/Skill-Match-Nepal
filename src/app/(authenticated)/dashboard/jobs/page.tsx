@@ -4,6 +4,9 @@ import { PaginationComponent } from "../_components/pagination-component";
 import SearchInput from "../_components/search-input";
 import { getAllJobs } from "./action";
 import { JobCards } from "./_components/JobCards";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
 
 interface iAppProps {
   searchParams: Promise<{ [key: string]: string | string[] | unknown }>;
@@ -68,7 +71,12 @@ export default async function Page({ searchParams }: iAppProps) {
         </h2>
         <div className="flex items-center justify-between gap-2">
           {/* add button */}
-
+          <Link
+            href={"/dashboard/jobs/add"}
+            className={buttonVariants({ variant: "default" })}
+          >
+            Add New <PlusIcon />
+          </Link>
           {/* search */}
           <SearchInput />
           {/* filters */}

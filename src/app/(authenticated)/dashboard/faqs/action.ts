@@ -70,7 +70,7 @@ export async function addNewFaq(data: FaqSchemaType): Promise<ApiResponse> {
   try {
     const user = await getSignedInUser();
 
-    if (user.role !== "admin") {
+    if (user && user.role !== "admin") {
       return notFound();
     }
 
@@ -115,7 +115,7 @@ export async function updateFaqInfo(data: FaqSchemaType): Promise<ApiResponse> {
   try {
     const user = await getSignedInUser();
 
-    if (user.role !== "admin") {
+    if (user && user.role !== "admin") {
       return notFound();
     }
 
@@ -157,7 +157,7 @@ export async function deleteFaq(id: string): Promise<ApiResponse> {
   try {
     const user = await getSignedInUser();
 
-    if (user.role !== "admin") {
+    if (user && user.role !== "admin") {
       return notFound();
     }
 
@@ -196,7 +196,7 @@ export async function reorderFaq({
   try {
     const user = await getSignedInUser();
 
-    if (user.role !== "admin") {
+    if (user && user.role !== "admin") {
       return {
         success: false,
         message: "Unauthorized request.",

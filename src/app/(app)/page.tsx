@@ -1,13 +1,11 @@
-import {
-  TrendingUp,
-  Users,
-  Zap,
-  Target,
-} from "lucide-react";
+import { TrendingUp, Users, Zap, Target } from "lucide-react";
 import Hero from "./_components/home/hero";
 import Features from "./_components/home/features";
-import Benefits from "./_components/home/benefits";
 import CTASection from "./_components/home/cta";
+import TopJobs from "./_components/home/top-jobs";
+import { getAllTestimonials } from "../(authenticated)/dashboard/testimonials/action";
+import TestimonialWrapper from "./_components/home/testimonials";
+import FAQ from "./_components/home/faq";
 
 const features = [
   {
@@ -19,8 +17,7 @@ const features = [
   {
     icon: TrendingUp,
     title: "Top Searches",
-    description:
-      "See the most searched jobs by other candidates.",
+    description: "See the most searched jobs by other candidates.",
   },
   {
     icon: Zap,
@@ -34,26 +31,25 @@ const features = [
   },
 ];
 
-const benefits = [
-  "AI-powered job recommendations tailored to your skills",
-  "Real-time matching with thousands of opportunities",
-  "Detailed compatibility analysis for each position",
-  "Easy application process with one-click apply",
-  "Track your applications and matches in one place",
-  "Get notified of new matches instantly",
-];
+export default async function Page() {
+  const testimonialResponse = await getAllTestimonials();
+  const testimonials = testimonialResponse.success
+    ? testimonialResponse.data.testimonials
+    : [];
 
-export default function Page() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <Hero />
 
+      <TopJobs />
+
       {/* Features Section */}
       <Features features={features} />
 
-      {/* Benefits Section */}
-      <Benefits benefits={benefits} />
+      <TestimonialWrapper testimonials={testimonials} />
+
+      <FAQ />
 
       {/* CTA Section */}
       <CTASection />

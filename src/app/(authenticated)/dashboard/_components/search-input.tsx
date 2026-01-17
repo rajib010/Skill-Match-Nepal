@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { SearchIcon } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition, useEffect, useRef } from "react";
@@ -70,9 +71,9 @@ function SearchInput({ defaultValue }: SearchInputProps) {
   return (
     <div className="relative">
       <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
-      <input
+      <Input
         type="search"
-        className="border p-1.5 pl-10 rounded-md w-full"
+        className="p-1.5 pl-10 bg-white rounded-md w-full"
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

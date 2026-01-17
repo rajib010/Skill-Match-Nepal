@@ -8,7 +8,7 @@ export async function getActiveJobs(
   page: number = 1,
   limit: number = 12,
   search?: string,
-  sortField?: "title" | "company" | "createdAt" | "salary",
+  sortField?: "title" | "createdAt" | "salary",
   sortOrder?: "asc" | "desc",
   categoryId?: string,
   jobType?: string,
@@ -30,7 +30,6 @@ export async function getActiveJobs(
         {
           OR: [
             { title: { contains: search, mode: "insensitive" as const } },
-            { company: { contains: search, mode: "insensitive" as const } },
             { location: { contains: search, mode: "insensitive" as const } },
             { description: { contains: search, mode: "insensitive" as const } },
           ],

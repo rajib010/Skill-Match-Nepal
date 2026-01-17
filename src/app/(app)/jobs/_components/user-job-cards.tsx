@@ -41,11 +41,11 @@ export function UserJobCards({ jobs, search }: iAppProps) {
       {jobs.map((job) => (
         <div
           key={job.id}
-          className="bg-white border rounded-lg p-5 hover:shadow-lg transition-all duration-200 flex flex-col"
+          className="bg-white rounded-lg p-5 hover:shadow-lg transition-all duration-200 flex flex-col"
         >
           {/* Category Badge */}
           <div className="mb-3">
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="default" className="text-xs text-white">
               {job.category.name}
             </Badge>
           </div>
@@ -119,7 +119,7 @@ export function UserJobCards({ jobs, search }: iAppProps) {
               <span>{formatDate(job.createdAt)}</span>
             </div>
             <Link href={`/jobs/${job.id}`}>
-              <Button size="sm" variant="outline" className="group">
+              <Button size="sm" variant="default" className="group">
                 View Details
                 <IconArrowRight className="w-3.5 h-3.5 ml-1 group-hover:translate-x-1 transition-transform" />
               </Button>

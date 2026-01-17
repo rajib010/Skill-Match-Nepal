@@ -12,3 +12,15 @@ export const userTableHeaders = [
   },
   { key: "actions", label: "Actions", classname: "text-center" },
 ];
+
+export const categoryTableHeaders = [
+  { key: "sn", label: "SN", classname: "text-center" },
+  { key: "name", label: "Name" },
+  { key: "description", label: "Description" },
+  {
+    key: "_count.jobs",
+    label: "Jobs",
+    classname: "text-center",
+  },
+  { key: "actions", label: "Actions", classname: "text-center" },
+];
