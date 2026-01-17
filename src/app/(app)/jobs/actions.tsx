@@ -3,6 +3,7 @@
 import { prisma } from "@/database/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { isSkillMatch } from "./algorithm";
 
 export async function getActiveJobs(
   page: number = 1,
@@ -51,7 +52,7 @@ export async function getActiveJobs(
       };
     }
 
-    // Get user skills only if userId is provided
+    // Get user skills if userId is provided
     let userSkills: string[] = [];
     if (userId) {
       const userProfile = await prisma.userProfile.findUnique({
@@ -62,11 +63,11 @@ export async function getActiveJobs(
       });
 
       if (userProfile) {
-        userSkills = userProfile.skills.map((s) => s.skillName.toLowerCase());
+        userSkills = userProfile.skills.map((s) => s.skillName);
       }
     }
 
-    // If sorting by matchScore, fetch ALL jobs 
+    // If sorting by matchScore, fetch ALL jobs to calculate and sort properly
     const shouldFetchAll = sortField === "matchScore" && userId;
 
     const skip = shouldFetchAll ? undefined : (page - 1) * limit;
@@ -117,7 +118,7 @@ export async function getActiveJobs(
       prisma.job.count({ where: whereClause }),
     ]);
 
-    // Calculate match scores for each job
+    // Calculate match scores for each job using Levenshtein algorithm
     const jobsWithMatchScore = jobs.map((job) => {
       let matchScore = 0;
 
@@ -128,28 +129,36 @@ export async function getActiveJobs(
         let matchedRequired = 0;
         let matchedPreferred = 0;
 
+        // Check required skills with Levenshtein fuzzy matching
         requiredSkills.forEach((req) => {
-          if (userSkills.includes(req.skillName.toLowerCase())) {
+          const hasMatch = userSkills.some(
+            (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+          );
+          if (hasMatch) {
             matchedRequired++;
           }
         });
 
+        // Check preferred skills with Levenshtein fuzzy matching
         preferredSkills.forEach((req) => {
-          if (userSkills.includes(req.skillName.toLowerCase())) {
+          const hasMatch = userSkills.some(
+            (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+          );
+          if (hasMatch) {
             matchedPreferred++;
           }
         });
 
-        // Calculate score: 70% weight for required, 30% for preferred
+        // Calculate weighted score: 70% for required skills, 30% for preferred skills
         const requiredScore =
           requiredSkills.length > 0
             ? (matchedRequired / requiredSkills.length) * 70
-            : 70;
+            : 70; // Full score if no required skills
 
         const preferredScore =
           preferredSkills.length > 0
             ? (matchedPreferred / preferredSkills.length) * 30
-            : 30;
+            : 30; // Full score if no preferred skills
 
         matchScore = Math.round(requiredScore + preferredScore);
       }
@@ -165,21 +174,23 @@ export async function getActiveJobs(
       };
     });
 
+    // Sort and apply sliding window pagination
     let finalJobs = jobsWithMatchScore;
 
     if (sortField === "matchScore" && userId) {
-      // Sort by match score
+      // Sort all jobs by match score
       finalJobs = jobsWithMatchScore.sort((a, b) => {
         return sortOrder === "asc"
           ? a.matchScore - b.matchScore
           : b.matchScore - a.matchScore;
       });
 
-      // Apply pagination AFTER sorting
+      // Apply sliding window pagination AFTER sorting
       const windowStart = (page - 1) * limit;
       const windowEnd = windowStart + limit;
       finalJobs = finalJobs.slice(windowStart, windowEnd);
     }
+    // If sortField is "createdAt", jobs are already sorted and paginated by database
 
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -311,40 +322,46 @@ export async function applyForJob(
       },
     });
 
-    // Calculate match score based on skills
+    // Calculate match score based on skills using Levenshtein algorithm
     let matchScore = 0;
     if (userProfile && job.requirements.length > 0) {
-      const userSkills = userProfile.skills.map((s) =>
-        s.skillName.toLowerCase()
-      );
+      const userSkills = userProfile.skills.map((s) => s.skillName);
       const requiredSkills = job.requirements.filter((r) => r.required);
       const preferredSkills = job.requirements.filter((r) => !r.required);
 
       let matchedRequired = 0;
       let matchedPreferred = 0;
 
+      // Check required skills with Levenshtein fuzzy matching
       requiredSkills.forEach((req) => {
-        if (userSkills.includes(req.skillName.toLowerCase())) {
+        const hasMatch = userSkills.some(
+          (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+        );
+        if (hasMatch) {
           matchedRequired++;
         }
       });
 
+      // Check preferred skills with Levenshtein fuzzy matching
       preferredSkills.forEach((req) => {
-        if (userSkills.includes(req.skillName.toLowerCase())) {
+        const hasMatch = userSkills.some(
+          (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+        );
+        if (hasMatch) {
           matchedPreferred++;
         }
       });
 
-      // Calculate score: 70% weight for required, 30% for preferred
+      // Calculate weighted score: 70% for required skills, 30% for preferred skills
       const requiredScore =
         requiredSkills.length > 0
           ? (matchedRequired / requiredSkills.length) * 70
-          : 70;
+          : 70; // Full score if no required skills
 
       const preferredScore =
         preferredSkills.length > 0
           ? (matchedPreferred / preferredSkills.length) * 30
-          : 30;
+          : 30; // Full score if no preferred skills
 
       matchScore = Math.round(requiredScore + preferredScore);
     }
@@ -372,7 +389,7 @@ export async function applyForJob(
 
     return {
       success: true,
-      message: `Successfully applied for ${application.job.title} at ${application.job.company}!`,
+      message: `Successfully applied for ${application.job.title} at ${application.job.company}! Match score: ${matchScore}%`,
       data: application,
     };
   } catch (error: unknown) {

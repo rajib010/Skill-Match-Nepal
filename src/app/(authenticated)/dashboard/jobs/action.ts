@@ -135,22 +135,30 @@ export async function deleteJob(id: string): Promise<ApiResponse> {
   }
 }
 
-export async function updateJob(
-  id: string,
-  data: {
-    title?: string;
-    description?: string;
-    company?: string;
-    location?: string;
-    salary?: string;
-    jobType?: string;
-    categoryId?: string;
-    isActive?: boolean;
-    expiresAt?: Date | null;
-    requirements?: Array<{ skillName: string; required: boolean }>;
-  }
-): Promise<ApiResponse> {
+export async function updateJob(data: JobSchemaType): Promise<ApiResponse> {
   try {
+    const validatedData = jobSchema.safeParse(data);
+
+    if (!validatedData.success) {
+      return {
+        success: false,
+        message: "Invalid data provided.",
+      };
+    }
+
+    const {
+      id,
+      categoryId,
+      company,
+      description,
+      expiresAt,
+      isActive,
+      jobType,
+      location,
+      requirements,
+      title,
+      salary,
+    } = validatedData.data;
     // Check if job exists
     const existingJob = await prisma.job.findUnique({
       where: { id },
@@ -164,13 +172,20 @@ export async function updateJob(
       };
     }
 
-    // Extract requirements from data
-    const { requirements, ...jobData } = data;
-
     // Update job
     const updatedJob = await prisma.job.update({
       where: { id },
-      data: jobData,
+      data: {
+        categoryId: categoryId ?? undefined,
+        company: company ?? undefined,
+        description: description ?? undefined,
+        expiresAt: expiresAt ? new Date(expiresAt) : undefined,
+        isActive: isActive ?? undefined,
+        jobType: jobType ?? undefined,
+        location: location ?? undefined,
+        title: title ?? undefined,
+        salary: salary ?? undefined,
+      },
       include: {
         category: true,
         requirements: true,
@@ -187,7 +202,7 @@ export async function updateJob(
       // Create new requirements
       await prisma.jobRequirement.createMany({
         data: requirements.map((req) => ({
-          jobId: id,
+          jobId: updatedJob.id,
           skillName: req.skillName,
           required: req.required,
         })),
@@ -201,9 +216,9 @@ export async function updateJob(
       message: "Job updated successfully.",
       data: updatedJob,
     };
-  } catch (error: unknown) {
-    let message = "Failed to update job.";
-    if (error instanceof Error) message = error.message;
+  } catch (error) {
+    console.log("🚀 ~ updateJob ~ error:", error);
+    const message = "Failed to update job.";
 
     return { success: false, message, data: null };
   }
@@ -230,6 +245,7 @@ export async function createJob(data: JobSchemaType): Promise<ApiResponse> {
       salary,
       categoryId,
       requirements,
+      expiresAt,
     } = validatedData.data;
 
     await prisma.job.create({
@@ -248,6 +264,7 @@ export async function createJob(data: JobSchemaType): Promise<ApiResponse> {
             required: req.required || true,
           })),
         },
+        expiresAt: new Date(expiresAt),
       },
     });
 

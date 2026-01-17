@@ -22,6 +22,10 @@ export const jobSchema = z.object({
       })
     )
     .min(1, "At least one skill is required."),
+  expiresAt: z
+    .string()
+    .min(1, "Expiry Date is required")
+    .max(100, "Max. 100 characters allowed."),
 });
 
 export type JobSchemaType = z.infer<typeof jobSchema>;

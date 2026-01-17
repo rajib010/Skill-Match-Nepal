@@ -32,6 +32,7 @@ import {
 import { PlusIcon } from "lucide-react";
 import { CategoryType, getMinimalCategories } from "../../categories/actions";
 import RichTextEditor from "@/app/(authenticated)/_components/rich-text/Editor";
+import { formatDateForCalender, getToday } from "@/app/(authenticated)/utils";
 
 interface iAppProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ export const JobEditModal = memo(function JobEditModal({
   onClose,
   job,
 }: iAppProps) {
+  console.log("🚀 ~ JobEditModal ~ job:", job)
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [descriptionCount, setSetDescriptionCount] = useState<number>(0);
@@ -53,6 +55,7 @@ export const JobEditModal = memo(function JobEditModal({
   const form = useForm<JobSchemaType>({
     resolver: zodResolver(jobSchema),
     defaultValues: {
+      id: job.id || "",
       title: job.title || "",
       salary: job.salary || "",
       company: job.company || "",
@@ -65,6 +68,7 @@ export const JobEditModal = memo(function JobEditModal({
       jobType: job.jobType || "",
       categoryId: job.categoryId || "",
       requirements: job.requirements || [],
+      expiresAt: formatDateForCalender(job.expiresAt) || "",
     },
   });
 
@@ -121,9 +125,7 @@ export const JobEditModal = memo(function JobEditModal({
     }
 
     try {
-      const result = await updateJob(job.id, {
-        ...data,
-      });
+      const result = await updateJob(data);
 
       if (result.success) {
         toast.success("Job updated successfully");
@@ -386,6 +388,34 @@ export const JobEditModal = memo(function JobEditModal({
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         className="cursor-pointer"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Active jobs are shown to the candidates.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* job availability */}
+            <div>
+              <FormField
+                control={form.control}
+                name="expiresAt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Expiry Date
+                      <span className="required-field">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        min={getToday()}
+                        value={field.value}
+                        onChange={field.onChange}
                       />
                     </FormControl>
                     <FormDescription>

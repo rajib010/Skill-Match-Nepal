@@ -33,6 +33,7 @@ import GoBackButton from "../../_components/go-back-button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { IconX } from "@tabler/icons-react";
+import { getToday } from "@/app/(authenticated)/utils";
 
 export default function Page() {
   const router = useRouter();
@@ -54,6 +55,7 @@ export default function Page() {
       jobType: "",
       categoryId: "",
       requirements: [],
+      expiresAt: "",
     },
   });
 
@@ -377,6 +379,28 @@ export default function Page() {
               />
             </div>
 
+            <div>
+              <FormField
+                control={form.control}
+                name="expiresAt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Expiry Date
+                      <span className="required-field">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} min={getToday()} />
+                    </FormControl>
+                    <FormDescription className="text-xs italic">
+                      Jobs after expiry date arenot shown to the users.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             {/* skills required */}
             <div className="space-y-4">
               <Label>
@@ -448,11 +472,7 @@ export default function Page() {
             disabled={isSubmitting || !isDirty}
           >
             Add Job{" "}
-            {isSubmitting ? (
-              <Loader2 className="animate-spin size-4" />
-            ) : (
-              <PlusIcon className="size-4" />
-            )}
+            {isSubmitting && <Loader2 className="animate-spin size-4" />}
           </Button>
         </div>
       </div>
