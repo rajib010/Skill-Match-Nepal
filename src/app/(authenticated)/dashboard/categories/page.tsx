@@ -25,6 +25,14 @@ const sortFields = [
       desc: "Newest First",
     },
   },
+  {
+    label: "Date",
+    key: "jobs._count",
+    options: {
+      desc: "Most Jobs",
+      asc: "Least Jobs",
+    },
+  },
 ];
 
 interface CategoryManagementPageProps {
@@ -59,10 +67,10 @@ export default async function CertificateManagementPage({
       ? resolvedSearchParams.sort
       : "asc";
 
-  const sortField = ["name", "createdAt"].includes(
+  const sortField = ["name", "createdAt", "jobs._count"].includes(
     resolvedSearchParams.sortField as string
   )
-    ? (resolvedSearchParams.sortField as "name" | "createdAt")
+    ? (resolvedSearchParams.sortField as "name" | "createdAt" | "jobs._count")
     : "createdAt";
 
   const res = await getAllCategory(page, limit, search, sortField, sortOrder);

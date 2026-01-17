@@ -7,16 +7,27 @@ import { notFound } from "next/navigation";
 import { categorySchema, CategorySchemaType } from "./schema";
 import slugify from "slugify";
 import { uuidv4 } from "zod";
+import { Prisma } from "@prisma/client";
 
 export async function getAllCategory(
   page: number = 1,
   limit: number = 10,
   search?: string,
-  sortField: "name" | "createdAt" = "createdAt",
-  sortOrder = "asc"
+  sortField: "name" | "createdAt" | "jobs._count" = "createdAt",
+  sortOrder: Prisma.SortOrder = "asc"
 ): Promise<ApiResponse> {
   try {
     const skip = (page - 1) * limit;
+    const orderBy =
+      sortField === "jobs._count"
+        ? {
+            jobs: {
+              _count: sortOrder,
+            },
+          }
+        : {
+            [sortField]: sortOrder,
+          };
 
     const where = search
       ? {
@@ -37,7 +48,7 @@ export async function getAllCategory(
         },
         skip,
         take: limit,
-        orderBy: { [sortField]: sortOrder },
+        orderBy: orderBy,
       }),
       prisma.category.count({ where }),
     ]);
