@@ -396,7 +396,6 @@ export async function trackSearchQuery(
   }
 }
 
-
 export async function getTopSearches(limit: number = 10, days: number = 30) {
   try {
     const dateFrom = new Date();
@@ -495,6 +494,109 @@ export async function getTrendingSearches(limit: number = 10) {
   }
 }
 
+export async function getAppliedJobs(
+  userId: string,
+  page: number = 1,
+  limit: number = 12,
+  search?: string,
+  sortField?: "title" | "createdAt" | "salary",
+  sortOrder?: "asc" | "desc"
+): Promise<ApiResponse> {
+  try {
+    if (!userId) {
+      return {
+        success: false,
+        message: "User id is required",
+      };
+    }
+
+    const user = await prisma.user.findFirst({ where: { id: userId } });
+
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+
+    const skip = (page - 1) * limit;
+
+    // Build where clause for search
+    const whereClause = {
+      userId,
+      job: search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" as const } },
+              { company: { contains: search, mode: "insensitive" as const } },
+              { location: { contains: search, mode: "insensitive" as const } },
+            ],
+          }
+        : undefined,
+    };
+
+    // Build orderBy clause
+    const orderBy =
+      sortField === "title" || sortField === "salary"
+        ? { job: { [sortField]: sortOrder || "desc" } }
+        : { [sortField || "createdAt"]: sortOrder || "desc" };
+
+    // Get total count for pagination
+    const totalCount = await prisma.jobApplication.count({
+      where: whereClause,
+    });
+
+    // Get applied jobs with pagination, search, and sorting
+    const appliedJobs = await prisma.jobApplication.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy,
+      include: {
+        job: {
+          include: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+              },
+            },
+            requirements: {
+              select: {
+                id: true,
+                skillName: true,
+                required: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const totalPages = Math.ceil(totalCount / limit);
+
+    return {
+      success: true,
+      message: "User's applied jobs fetched successfully.",
+      data: {
+        appliedJobs,
+        total: totalCount,
+        page,
+        limit,
+        totalPages,
+        hasMore: page < totalPages,
+      },
+    };
+  } catch (error) {
+    console.log("🚀 ~ getAppliedJobs ~ error:", error);
+    return {
+      success: false,
+      message: "Failed to get user applied jobs.",
+    };
+  }
+}
+
 export type UserJobsType = Awaited<
   ReturnType<typeof getActiveJobs>
 >["data"]["jobs"];
@@ -503,3 +605,6 @@ export type CategoriesType = Awaited<ReturnType<typeof getCategories>>["data"];
 export type UserApplicationsType = Awaited<
   ReturnType<typeof getUserApplications>
 >["data"]["applications"];
+export type AppliedJobType = NonNullable<
+  Awaited<ReturnType<typeof getAppliedJobs>>
+>["data"];

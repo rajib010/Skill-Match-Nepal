@@ -1,7 +1,6 @@
 import { TrendingUp, Users, Zap, Target } from "lucide-react";
 import Hero from "./_components/home/hero";
 import Features from "./_components/home/features";
-import CTASection from "./_components/home/cta";
 import TopJobs from "./_components/home/top-jobs";
 import { getAllTestimonials } from "../(authenticated)/dashboard/testimonials/action";
 import TestimonialWrapper from "./_components/home/testimonials";
@@ -51,8 +50,6 @@ export default async function Page() {
 
       <FAQ />
 
-      {/* CTA Section */}
-      <CTASection />
     </div>
   );
 }

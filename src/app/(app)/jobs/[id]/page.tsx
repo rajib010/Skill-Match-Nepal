@@ -16,6 +16,8 @@ import { getSignedInUser } from "@/lib/auth/server";
 import { getJobDetails } from "../actions";
 import { ErrorDisplay } from "@/app/(authenticated)/dashboard/_components/error-display";
 import { ApplyButton } from "../_components/apply-button";
+import { RequirementType } from "@/app/(authenticated)/dashboard/jobs/_components/job-detail-modal";
+import { RenderDescription } from "@/app/(authenticated)/_components/rich-text/RenderDescription";
 
 interface iAppProps {
   params: Promise<{ id: string }>;
@@ -50,18 +52,26 @@ export default async function JobDetailPage({ params }: iAppProps) {
 
   const job = res.data;
 
+  const parsed = (() => {
+    try {
+      // Try to parse the description as JSON
+      const parsed = JSON.parse(job.description);
+      return <RenderDescription json={parsed} />;
+    } catch {
+      // If parsing fails, it's plain text
+      return (
+        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+          {job.description}
+        </p>
+      );
+    }
+  })();
+
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="">
       {/* Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
-          <Link href="/jobs">
-            <Button variant="ghost" size="sm" className="mb-4">
-              <IconArrowLeft className="w-4 h-4 mr-2" />
-              Back to Jobs
-            </Button>
-          </Link>
-
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-3">
@@ -130,9 +140,7 @@ export default async function JobDetailPage({ params }: iAppProps) {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   Job Description
                 </h2>
-                <div className="prose max-w-none text-gray-700 whitespace-pre-wrap">
-                  {job.description}
-                </div>
+                {parsed}
               </div>
 
               {/* Requirements */}
@@ -142,7 +150,7 @@ export default async function JobDetailPage({ params }: iAppProps) {
                     Required Skills
                   </h2>
                   <div className="space-y-3">
-                    {job.requirements.map((req) => (
+                    {job.requirements.map((req: RequirementType) => (
                       <div
                         key={req.id}
                         className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
@@ -236,16 +244,6 @@ export default async function JobDetailPage({ params }: iAppProps) {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Company Info Card */}
-            <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                About {job.company}
-              </h3>
-              <p className="text-sm text-gray-600">
-                Learn more about this opportunity at {job.company}
-              </p>
             </div>
           </div>
         </div>

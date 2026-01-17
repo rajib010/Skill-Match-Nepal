@@ -44,7 +44,7 @@ export default async function Page({ searchParams }: iAppProps) {
   const sortOrder =
     resolvedParams.sort === "asc" || resolvedParams.sort === "desc"
       ? resolvedParams.sort
-      : "asc";
+      : "desc";
 
   const sortField = ["title", "createdAt"].includes(
     resolvedParams.sortField as string
