@@ -59,6 +59,7 @@ model UserSkill {
   level     String? // beginner, intermediate, expert
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([profileId, skillName])
   @@index([skillName])
@@ -113,6 +114,7 @@ model JobRequirement {
   required  Boolean @default(true) // required vs preferred
 
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([jobId, skillName])
   @@index([skillName])
@@ -144,6 +146,7 @@ model SearchQuery {
   query        String
   resultsCount Int      @default(0)
   createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([query, createdAt])
   @@index([createdAt])

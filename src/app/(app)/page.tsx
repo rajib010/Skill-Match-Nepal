@@ -34,18 +34,26 @@ const features = [
 
 export default async function Page() {
   const user = await getSignedInUser();
+  const isLoggedIn = user && user.role === "user";
+  let jobFilter: "createdAt" | "matchScore";
+
+  if (isLoggedIn) {
+    jobFilter = "matchScore";
+  } else {
+    jobFilter = "createdAt";
+  }
   const [testimonialResponse, topJobResponse] = await Promise.all([
     getAllTestimonials(),
     getActiveJobs(
       1,
       3,
       undefined,
-      "matchScore",
+      jobFilter,
       "desc",
       undefined,
       undefined,
       undefined,
-      user?.id
+      user?.id,
     ),
   ]);
   const testimonials = testimonialResponse.success
@@ -59,7 +67,7 @@ export default async function Page() {
       {/* Hero Section */}
       <Hero />
 
-      <TopJobs jobs={topJobs} />
+      <TopJobs jobs={topJobs} isLoggedIn={isLoggedIn || false} />
 
       {/* Features Section */}
       <Features features={features} />

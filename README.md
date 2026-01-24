@@ -15,3 +15,5 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+“Levenshtein algorithm is used for fuzzy skill matching to handle spelling variations, while the Sliding Window algorithm is used for efficient pagination after ranking jobs by match score.”
