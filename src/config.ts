@@ -12,6 +12,9 @@ export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET;
 
 export const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 export const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+export const GOOGLE_RECAPTCHA_SITE_KEY =
+  process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_SITE_KEY;
+export const GOOGLE_RECAPTCHA_SECRET_KEY = process.env.GOOGLE_RECAPTCHA_SECRET_KEY;
 
 export const MAIL = {
   HOST: process.env.MAIL_HOST as string,

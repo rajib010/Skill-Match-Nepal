@@ -43,3 +43,11 @@ export const applicationTableHeaders = [
 
   { key: "actions", label: "Actions", classname: "text-center" },
 ];
+
+export const contactTableHeaders = [
+  { key: "sn", label: "SN", classname: "max-w-[25px] text-center" },
+  { key: "name", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "message", label: "Message", classname: "max-w-[250px]" },
+  { key: "actions", label: "Actions" },
+];
