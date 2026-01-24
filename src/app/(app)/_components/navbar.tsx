@@ -45,7 +45,6 @@ export default function Navbar() {
                   { href: "/jobs", label: "Jobs" },
                   { href: "/about", label: "About" },
                   { href: "/contact", label: "Contact" },
-                  { href: "/faq", label: "FAQ" },
                 ].map(({ href, label }) => (
                   <Link
                     key={href}
