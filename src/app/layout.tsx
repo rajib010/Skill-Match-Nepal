@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   description: "Find jobs based on your skills.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{

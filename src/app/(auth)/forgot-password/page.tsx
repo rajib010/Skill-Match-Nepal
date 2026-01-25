@@ -39,6 +39,7 @@ export default function ForgotPasswordPage() {
 
             setLoading(false);
 
+            console.log("🚀 ~ ForgotPasswordPage ~ error:", error)
             if (error) {
               setError(error.message || "An error occurred");
               return;

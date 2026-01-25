@@ -74,7 +74,7 @@ export default function VerifyEmail({ user, url }: Props) {
                             color: '#6b7280',
                             lineHeight: '1.5'
                         }}>
-                            Thank you for signing up for Skill Match! We&apos;re excited to have you join our thermal therapy community.
+                            Thank you for signing up for Skill Match! We&apos;re excited to have you join our platform.
                         </p>
 
                         <p style={{
