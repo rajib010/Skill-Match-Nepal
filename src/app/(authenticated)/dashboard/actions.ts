@@ -128,6 +128,10 @@ export async function getDashboardData(
     }),
     prisma.user.count({
       where: {
+        role: {
+          equals: "user",
+          mode: "insensitive" as const,
+        },
         createdAt: {
           gte: start,
           lte: end,
@@ -161,6 +165,10 @@ export async function getDashboardData(
     }),
     prisma.user.count({
       where: {
+        role: {
+          equals: "user",
+          mode: "insensitive" as const,
+        },
         createdAt: {
           gte: previousStart,
           lte: previousEnd,
@@ -234,6 +242,10 @@ async function generateChartData(
         }),
         prisma.user.count({
           where: {
+            role: {
+              equals: "user",
+              mode: "insensitive" as const,
+            },
             createdAt: {
               gte: dayStart,
               lte: dayEnd,
@@ -283,6 +295,10 @@ async function generateChartData(
         }),
         prisma.user.count({
           where: {
+            role: {
+              equals: "user",
+              mode: "insensitive" as const,
+            },
             createdAt: {
               gte: weekStart,
               lte: weekEnd,
@@ -347,6 +363,10 @@ async function generateChartData(
         }),
         prisma.user.count({
           where: {
+            role: {
+              equals: "user",
+              mode: "insensitive" as const,
+            },
             createdAt: {
               gte: monthStart,
               lte: actualEnd,
@@ -450,6 +470,10 @@ export async function getUserGrowthMetrics(period: TimePeriod) {
   const [currentUsers, previousUsers, totalUsers] = await Promise.all([
     prisma.user.count({
       where: {
+        role: {
+          equals: "user",
+          mode: "insensitive" as const,
+        },
         createdAt: {
           gte: start,
           lte: end,
@@ -458,6 +482,10 @@ export async function getUserGrowthMetrics(period: TimePeriod) {
     }),
     prisma.user.count({
       where: {
+        role: {
+          equals: "user",
+          mode: "insensitive" as const,
+        },
         createdAt: {
           gte: previousStart,
           lte: previousEnd,
