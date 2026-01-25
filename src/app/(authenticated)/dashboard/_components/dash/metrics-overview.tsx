@@ -84,7 +84,7 @@ export default function MetricsOverview({
       <div className="rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Total Users</h3>
-          <div className="bg-yellow-600 text-white rounded-full p-2">
+          <div className="bg-[#D4AF37] text-white rounded-full p-2">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -100,7 +100,7 @@ export default function MetricsOverview({
             </svg>
           </div>
         </div>
-        <div className="text-4xl font-bold text-yello-600 mb-2">
+        <div className="text-4xl font-bold text-[#D4AF37] mb-2">
           {userGrowthMetrics.totalUsers.toLocaleString()}
         </div>
         <p className="text-sm text-gray-700">Registered users on platform</p>

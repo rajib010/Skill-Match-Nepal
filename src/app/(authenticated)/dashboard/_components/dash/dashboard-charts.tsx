@@ -48,7 +48,7 @@ export default function DashboardCharts({
   jobPostingTrends,
 }: DashboardChartsProps) {
   const statusData = [
-    { name: "Pending", value: applicationStatus.pending, color: "#fbbf24" },
+    { name: "Pending", value: applicationStatus.pending, color: "#D4AF37" },
     { name: "Reviewed", value: applicationStatus.reviewed, color: "#3B82C6" },
     { name: "Accepted", value: applicationStatus.accepted, color: "#34d399" },
     { name: "Rejected", value: applicationStatus.rejected, color: "#f87171" },
@@ -196,7 +196,7 @@ export default function DashboardCharts({
                 dataKey="count"
               >
                 {jobPostingTrends.map((entry, index) => {
-                  const colors = ["#3B82C6", "#10b981", "#f59e0b", "#ef4444"];
+                  const colors = ["#3B82C6", "#10b981", "#D4AF37", "#ef4444"];
                   return (
                     <Cell
                       key={`cell-${index}`}
