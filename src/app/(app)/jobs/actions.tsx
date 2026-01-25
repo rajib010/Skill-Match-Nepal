@@ -499,21 +499,36 @@ export async function getUserApplications(
   }
 }
 
-export async function trackSearchQuery(
-  query: string,
-  userId: string | null,
-  resultsCount: number,
-) {
+export async function trackSearchQuery(query: string) {
   try {
-    await prisma.searchQuery.create({
-      data: {
-        query: query.trim().toLowerCase(),
-        resultsCount,
+    const existingRecord = await prisma.searchQuery.findFirst({
+      where: {
+        query: { equals: query, mode: "insensitive" },
+      },
+      select: {
+        id: true,
       },
     });
+
+    if (existingRecord) {
+      await prisma.searchQuery.update({
+        where: { id: existingRecord.id },
+        data: {
+          resultsCount: {
+            increment: 1,
+          },
+        },
+      });
+    } else {
+      await prisma.searchQuery.create({
+        data: {
+          query,
+          resultsCount: 1,
+        },
+      });
+    }
   } catch (error) {
     console.error("Error tracking search query:", error);
-    // Don't throw - tracking should not break the search
   }
 }
 
