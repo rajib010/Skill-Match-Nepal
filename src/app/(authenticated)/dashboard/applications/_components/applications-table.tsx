@@ -17,11 +17,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, NotebookTabs } from "lucide-react";
+import { MoreHorizontal, Trash2Icon, User2Icon } from "lucide-react";
 import { getValue } from "@/app/(authenticated)/utils";
 import { useState } from "react";
 import { AlertModal } from "../../_components/alert-modal";
 import { ApplicationType, deleteApplication } from "../actions";
+import { UserDetailModal } from "../../users/_components/UserDetailModal";
+import { useRouter } from "next/navigation";
 
 interface iAppProps {
   applications: ApplicationType[];
@@ -30,12 +32,56 @@ interface iAppProps {
   search?: string;
 }
 
-export function ApplicationTable({ applications, limit, page, search }: iAppProps) {
+type DialogState = {
+  type: "detail" | "delete" | null;
+  open: boolean;
+};
+
+export function ApplicationTable({
+  applications,
+  limit,
+  page,
+  search,
+}: iAppProps) {
+  const router = useRouter();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState<ApplicationType | null>(
-    null
-  );
+  const [openModal, setOpenModal] = useState<DialogState>({
+    type: null,
+    open: false,
+  });
+  const [selectedApplication, setSelectedApplication] =
+    useState<ApplicationType | null>(null);
+
+  const handleCloseModal = () => {
+    setOpenModal({ type: null, open: false });
+    setSelectedApplication(null);
+  };
+
+  const handleOpenDetailModal = (app: ApplicationType, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedApplication(app);
+    setOpenModal({ type: "detail", open: true });
+    setOpenDropdownId(null);
+  };
+
+  const handleOpenDeleteModal = (app: ApplicationType, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedApplication(app);
+    setOpenModal({ type: "delete", open: true });
+    setOpenDropdownId(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (selectedApplication) {
+      await deleteApplication(selectedApplication.id);
+      handleCloseModal();
+    }
+  };
+
+  const handleApplicationNavigate = (id: string) => {
+    if (!id) return;
+    return router.replace(`/dashboard/applications/${id}`);
+  };
 
   return (
     <>
@@ -55,7 +101,11 @@ export function ApplicationTable({ applications, limit, page, search }: iAppProp
         <TableBody>
           {applications.length > 0 ? (
             applications.map((app: ApplicationType, idx: number) => (
-              <TableRow key={idx + "-" + app.id}>
+              <TableRow
+                key={idx + "-" + app.id}
+                onClick={() => handleApplicationNavigate(app.id)}
+                className="cursor-pointer"
+              >
                 {applicationTableHeaders.map((header) => {
                   let value: React.ReactNode;
 
@@ -70,20 +120,32 @@ export function ApplicationTable({ applications, limit, page, search }: iAppProp
                         }}
                       >
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="size-8 p-0">
+                          <Button
+                            onClick={(e) => e.stopPropagation()}
+                            variant="ghost"
+                            className="size-8 p-0"
+                          >
                             <MoreHorizontal className="size-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent
+                          align="end"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <DropdownMenuItem
-                            onSelect={(e) => {
-                              e.preventDefault();
-                              setSelectedApplication(app);
-                              setOpenDropdownId(null); // Close dropdown
+                            onClick={(e) => {
+                              handleOpenDetailModal(app, e); // Close dropdown
                             }}
                           >
-                            <NotebookTabs className="size-4" />
-                            View Detail
+                            <User2Icon className="size-4" />
+                            User Detail
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              handleOpenDeleteModal(app, e);
+                            }}
+                          >
+                            <Trash2Icon className="size-4" /> Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -114,17 +176,24 @@ export function ApplicationTable({ applications, limit, page, search }: iAppProp
       </Table>
 
       {/* Delete Dialog */}
-      {selectedApplication && showDeleteDialog && (
+      {selectedApplication && openModal.type === "delete" && (
         <AlertModal
-          open={showDeleteDialog}
-          onOpenChange={setShowDeleteDialog}
-          action={async () => {
-            await deleteApplication(selectedApplication.id);
-            setShowDeleteDialog(false);
-            setSelectedApplication(null);
+          open={openModal.open}
+          onOpenChange={(open) => {
+            if (!open) handleCloseModal();
           }}
+          action={handleDeleteConfirm}
           description="This action cannot be undone. This will delete the application information completely from our records. You cannot retrieve it later."
           mainText="Are you sure you want to delete this application?"
+        />
+      )}
+
+      {/* Show user detail */}
+      {selectedApplication?.user && openModal.type === "detail" && (
+        <UserDetailModal
+          isOpen={openModal.open}
+          onClose={handleCloseModal}
+          user={selectedApplication?.user}
         />
       )}
     </>

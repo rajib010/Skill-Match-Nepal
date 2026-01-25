@@ -10,7 +10,7 @@ import {
   IconCheck,
   IconAlertCircle,
 } from "@tabler/icons-react";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getStatusColor } from "@/lib/utils";
 import Link from "next/link";
 import { getSignedInUser } from "@/lib/auth/server";
 import { getJobDetails } from "../actions";
@@ -67,6 +67,8 @@ export default async function JobDetailPage({ params }: iAppProps) {
     }
   })();
 
+  const statusButton = getStatusColor(job.status);
+
   return (
     <main className="">
       {/* Header */}
@@ -113,10 +115,7 @@ export default async function JobDetailPage({ params }: iAppProps) {
                     hasApplied={job.hasApplied}
                   />
                   {job.hasApplied && (
-                    <div className="flex items-center gap-2 text-sm text-green-600 bg-green-50 px-3 py-2 rounded-md">
-                      <IconCheck className="w-4 h-4" />
-                      <span>Already Applied</span>
-                    </div>
+                      <span className={`px-4 py-2 uppercase text-center rounded-md ${statusButton.bg} ${statusButton.text}`}>{job.status}</span>
                   )}
                 </>
               ) : (

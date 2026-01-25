@@ -14,7 +14,7 @@ export async function getActiveJobs(
   categoryId?: string,
   jobType?: string,
   location?: string,
-  userId?: string
+  userId?: string,
 ): Promise<ApiResponse> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -132,7 +132,7 @@ export async function getActiveJobs(
         // Check required skills with Levenshtein fuzzy matching
         requiredSkills.forEach((req) => {
           const hasMatch = userSkills.some(
-            (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+            (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
           );
           if (hasMatch) {
             matchedRequired++;
@@ -142,7 +142,7 @@ export async function getActiveJobs(
         // Check preferred skills with Levenshtein fuzzy matching
         preferredSkills.forEach((req) => {
           const hasMatch = userSkills.some(
-            (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+            (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
           );
           if (hasMatch) {
             matchedPreferred++;
@@ -217,7 +217,7 @@ export async function getActiveJobs(
 
 export async function getJobDetails(
   id: string,
-  userId?: string
+  userId?: string,
 ): Promise<ApiResponse> {
   try {
     const job = await prisma.job.findUnique({
@@ -247,6 +247,7 @@ export async function getJobDetails(
 
     // Check if user has already applied
     let hasApplied = false;
+    let status: string | undefined = "pending";
     if (userId) {
       const application = await prisma.jobApplication.findUnique({
         where: {
@@ -257,6 +258,7 @@ export async function getJobDetails(
         },
       });
       hasApplied = !!application;
+      status = application?.status;
     }
 
     return {
@@ -265,6 +267,7 @@ export async function getJobDetails(
       data: {
         ...job,
         hasApplied,
+        status,
       },
     };
   } catch (error: unknown) {
@@ -277,7 +280,7 @@ export async function getJobDetails(
 
 export async function applyForJob(
   jobId: string,
-  userId: string
+  userId: string,
 ): Promise<ApiResponse> {
   try {
     // Check if job exists and is active
@@ -335,7 +338,7 @@ export async function applyForJob(
       // Check required skills with Levenshtein fuzzy matching
       requiredSkills.forEach((req) => {
         const hasMatch = userSkills.some(
-          (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+          (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
         );
         if (hasMatch) {
           matchedRequired++;
@@ -345,7 +348,7 @@ export async function applyForJob(
       // Check preferred skills with Levenshtein fuzzy matching
       preferredSkills.forEach((req) => {
         const hasMatch = userSkills.some(
-          (userSkill) => isSkillMatch(userSkill, req.skillName, 2) // threshold = 2
+          (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
         );
         if (hasMatch) {
           matchedPreferred++;
@@ -443,7 +446,7 @@ export async function getUserApplications(
   userId: string,
   page: number = 1,
   limit: number = 10,
-  status?: string
+  status?: string,
 ): Promise<ApiResponse> {
   try {
     const skip = (page - 1) * limit;
@@ -499,7 +502,7 @@ export async function getUserApplications(
 export async function trackSearchQuery(
   query: string,
   userId: string | null,
-  resultsCount: number
+  resultsCount: number,
 ) {
   try {
     await prisma.searchQuery.create({
@@ -583,7 +586,7 @@ export async function getTrendingSearches(limit: number = 10) {
 
     // Calculate growth rate
     const previousMap = new Map(
-      previousSearches.map((s) => [s.query, s._count.query])
+      previousSearches.map((s) => [s.query, s._count.query]),
     );
 
     const trending = recentSearches
@@ -618,7 +621,7 @@ export async function getAppliedJobs(
   limit: number = 12,
   search?: string,
   sortField?: "title" | "createdAt" | "salary",
-  sortOrder?: "asc" | "desc"
+  sortOrder?: "asc" | "desc",
 ): Promise<ApiResponse> {
   try {
     if (!userId) {

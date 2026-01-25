@@ -45,7 +45,6 @@ export const JobEditModal = memo(function JobEditModal({
   onClose,
   job,
 }: iAppProps) {
-  console.log("🚀 ~ JobEditModal ~ job:", job)
   const [categories, setCategories] = useState<CategoryType[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [descriptionCount, setSetDescriptionCount] = useState<number>(0);

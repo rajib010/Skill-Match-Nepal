@@ -80,7 +80,7 @@ function StatCard({
           <p className="text-gray-600 text-sm font-medium">{title}</p>
           <p className="text-3xl font-bold mt-2">{value.toLocaleString()}</p>
           <p
-            className={`text-sm mt-2 items-center p-2 w-18 max-w-sm rounded-sm  ${
+            className={`text-sm mt-2 p-2 w-full max-w-sm rounded-sm  ${
               change === 0
                 ? "text-gray-500 bg-gray-100"
                 : change > 0

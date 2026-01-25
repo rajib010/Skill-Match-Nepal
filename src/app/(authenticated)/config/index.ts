@@ -40,7 +40,7 @@ export const applicationTableHeaders = [
   },
   { key: "job.jobType", label: "Job Type" },
   { key: "matchScore", label: "Match Score" },
-
+  { key: "status", label: "Status" , classname:"uppercase"},
   { key: "actions", label: "Actions", classname: "text-center" },
 ];
 
