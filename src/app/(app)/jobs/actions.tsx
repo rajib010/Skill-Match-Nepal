@@ -32,6 +32,18 @@ export async function getActiveJobs(
             { location: { contains: search, mode: "insensitive" as const } },
             { description: { contains: search, mode: "insensitive" as const } },
             { company: { contains: search, mode: "insensitive" as const } },
+            {
+              category: {
+                name: { contains: search, mode: "insensitive" as const },
+              },
+            },
+            {
+              requirements: {
+                some: {
+                  skillName: { contains: search, mode: "insensitive" as const },
+                },
+              },
+            },
           ],
         },
       ];
