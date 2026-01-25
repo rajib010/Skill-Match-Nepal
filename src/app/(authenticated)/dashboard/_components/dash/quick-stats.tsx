@@ -21,7 +21,7 @@ export default function QuickStats({ dashboardData }: QuickStatsProps) {
     <div className="bg-white rounded-lg shadow-md p-6 mb-6">
       <h3 className="text-xl font-semibold mb-4">Quick Statistics</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="border-l-4 border-blue-500 pl-4">
+        <div className="border-l-4 border-primary pl-4">
           <p className="text-sm text-gray-600">Avg Applications per Job</p>
           <p className="text-2xl font-bold text-gray-900">
             {avgApplicationsPerJob}
@@ -33,7 +33,7 @@ export default function QuickStats({ dashboardData }: QuickStatsProps) {
             {activeJobsPercentage}%
           </p>
         </div>
-        <div className="border-l-4 border-purple-500 pl-4">
+        <div className="border-l-4 border-yellow-500 pl-4">
           <p className="text-sm text-gray-600">Total Engagements</p>
           <p className="text-2xl font-bold text-gray-900">
             {(

@@ -28,28 +28,24 @@ export default function DashboardStats({
       title: "Total Jobs",
       value: dashboardData.totalJobs,
       change: dashboardData.jobsGrowth,
-      color: "#3b82f6",
     },
     {
       icon: Users,
       title: "Total Applications",
       value: dashboardData.totalApplications,
       change: dashboardData.applicationsGrowth,
-      color: "#8b5cf6",
     },
     {
       icon: TrendingUp,
-      title: "New Users",
+      title: "Total Users",
       value: dashboardData.totalUsers,
       change: dashboardData.usersGrowth,
-      color: "#10b981",
     },
     {
       icon: CheckCircle,
       title: "Active Jobs",
       value: dashboardData.activeJobs,
       change: applicationSuccessRate.successRate,
-      color: "#f59e0b",
     },
   ];
 
@@ -67,39 +63,36 @@ function StatCard({
   title,
   value,
   change,
-  color,
 }: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: any;
   title: string;
   value: number;
   change: number;
-  color: string;
 }) {
   return (
     <div
       className="bg-white rounded-lg shadow-md p-6 border-l-4"
-      style={{ borderLeftColor: color }}
+      style={{ borderLeftColor: "primary" }}
     >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-600 text-sm font-medium">{title}</p>
           <p className="text-3xl font-bold mt-2">{value.toLocaleString()}</p>
           <p
-            className={`text-sm mt-2 flex items-center ${
-              change >= 0 ? "text-green-600" : "text-red-600"
+            className={`text-sm mt-2 items-center p-2 w-18 max-w-sm rounded-sm  ${
+              change === 0
+                ? "text-gray-500 bg-gray-100"
+                : change > 0
+                  ? "text-green-600 bg-green-100"
+                  : "text-red-600 bg-red-100"
             }`}
           >
-            <TrendingUp className="w-4 h-4 mr-1" />
-            {change >= 0 ? "+" : ""}
-            {change}% vs last period
+            {change} %
           </p>
         </div>
-        <div
-          className="p-3 rounded-full"
-          style={{ backgroundColor: color + "20" }}
-        >
-          <Icon className="w-8 h-8" style={{ color }} />
+        <div className="p-3 rounded-full bg-primary">
+          <Icon className="w-8 h-8 text-white" />
         </div>
       </div>
     </div>

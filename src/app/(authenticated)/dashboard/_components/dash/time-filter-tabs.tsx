@@ -24,7 +24,7 @@ export default function TimeFilterTabs({ currentFilter }: TimeFilterTabsProps) {
           href={`${pathname}?filter=${filter.value}`}
           className={`px-6 py-2 rounded-lg font-medium transition-all ${
             currentFilter === filter.value
-              ? "bg-blue-600 text-white shadow-md"
+              ? "bg-primary text-white shadow-md"
               : "bg-white text-gray-700 hover:bg-gray-100 shadow"
           }`}
         >

@@ -49,7 +49,7 @@ export default function DashboardCharts({
 }: DashboardChartsProps) {
   const statusData = [
     { name: "Pending", value: applicationStatus.pending, color: "#fbbf24" },
-    { name: "Reviewed", value: applicationStatus.reviewed, color: "#60a5fa" },
+    { name: "Reviewed", value: applicationStatus.reviewed, color: "#3B82C6" },
     { name: "Accepted", value: applicationStatus.accepted, color: "#34d399" },
     { name: "Rejected", value: applicationStatus.rejected, color: "#f87171" },
   ];
@@ -79,14 +79,14 @@ export default function DashboardCharts({
               <Line
                 type="monotone"
                 dataKey="jobs"
-                stroke="#3b82f6"
+                stroke="#3B82C6"
                 strokeWidth={2}
                 name="Jobs Posted"
               />
               <Line
                 type="monotone"
                 dataKey="applications"
-                stroke="#8b5cf6"
+                stroke="#D4AF37"
                 strokeWidth={2}
                 name="Applications"
               />
@@ -110,7 +110,7 @@ export default function DashboardCharts({
                   `${name} ${(percent * 100).toFixed(0)}%`
                 }
                 outerRadius={100}
-                fill="#8884d8"
+                fill="#3B82C6"
                 dataKey="value"
               >
                 {statusData.map((entry, index) => (
@@ -137,7 +137,7 @@ export default function DashboardCharts({
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="users" fill="#10b981" name="New Users" />
+              <Bar dataKey="users" fill="#3B82C6" name="New Users" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -152,8 +152,8 @@ export default function DashboardCharts({
               <YAxis dataKey="category" type="category" width={100} />
               <Tooltip />
               <Legend />
-              <Bar dataKey="jobs" fill="#f59e0b" name="Jobs" />
-              <Bar dataKey="applications" fill="#8b5cf6" name="Applications" />
+              <Bar dataKey="jobs" fill="#3B82C6" name="Jobs" />
+              <Bar dataKey="applications" fill="#D4AF37" name="Applications" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -173,7 +173,7 @@ export default function DashboardCharts({
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="count" fill="#6366f1" name="Job Count" />
+              <Bar dataKey="count" fill="#3B82C6" name="Job Count" />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -196,7 +196,7 @@ export default function DashboardCharts({
                 dataKey="count"
               >
                 {jobPostingTrends.map((entry, index) => {
-                  const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444"];
+                  const colors = ["#3B82C6", "#10b981", "#f59e0b", "#ef4444"];
                   return (
                     <Cell
                       key={`cell-${index}`}

@@ -45,21 +45,21 @@ export default function DataTable({ topCategories }: DataTableProps) {
                   className="border-b border-gray-100 hover:bg-gray-50"
                 >
                   <td className="py-3 px-4">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-semibold">
+                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white font-semibold">
                       {index + 1}
                     </span>
                   </td>
                   <td className="py-3 px-4 font-medium text-gray-900">
                     {category.categoryName}
                   </td>
-                  <td className="py-3 px-4 text-right text-gray-700">
+                  <td className="py-3 px-4 text-gray-700 text-center">
                     {category.jobCount}
                   </td>
-                  <td className="py-3 px-4 text-right text-gray-700">
+                  <td className="py-3 px-4 text-gray-700 text-center">
                     {category.applicationCount}
                   </td>
-                  <td className="py-3 px-4 text-right">
-                    <span className="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium">
+                  <td className="py-3 px-4 text-center">
+                    <span className="inline-block bg-green-50 text-green-600 px-3 py-1 rounded-full text-sm font-medium">
                       {avgApps}
                     </span>
                   </td>
