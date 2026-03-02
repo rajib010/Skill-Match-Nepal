@@ -4,6 +4,9 @@ import { prisma } from "@/database/prisma";
 import { getSignedInUser } from "@/lib/auth/server";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
+import { sendMail } from "@/lib/mailer";
+import ApplicationAccepted from "@/mail/application-accepted";
+import { APP_URL } from "@/config";
 
 export async function getAllApplications(
   page: number = 1,
@@ -244,6 +247,33 @@ export async function updateApplicationStatus(
       };
     }
 
+    const application = await prisma.jobApplication.findUnique({
+      where: {
+        id: applicationId,
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
+        job: {
+          select: {
+            title: true,
+            company: true,
+          },
+        },
+      },
+    });
+
+    if (!application) {
+      return {
+        success: false,
+        message: "Application not found",
+      };
+    }
+
     await prisma.jobApplication.update({
       where: {
         id: applicationId,
@@ -253,6 +283,28 @@ export async function updateApplicationStatus(
         updatedAt: new Date(),
       },
     });
+
+    if (status === "accepted") {
+      try {
+        const applicationUrl = `${APP_URL}/jobs/applied`;
+
+        await sendMail({
+          to: application.user.email,
+          subject: `Congratulations! Your application for ${application.job.title} has been accepted`,
+          content: {
+            template: ApplicationAccepted,
+            props: {
+              userName: application.user.name,
+              jobTitle: application.job.title,
+              company: application.job.company,
+              applicationUrl,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send acceptance email:", emailError);
+      }
+    }
 
     revalidatePath(`/applications/${applicationId}`);
     revalidatePath("/applications");

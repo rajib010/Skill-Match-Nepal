@@ -76,49 +76,55 @@ export default function StatusUpdateDropdown({
   };
 
   const CurrentIcon = currentStatusOption?.icon || Clock;
+  const isAccepted = currentStatus.toLowerCase() === "accepted";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          disabled={isUpdating}
-          className={`min-w-[180px] justify-between`}
+          disabled={isUpdating || isAccepted}
+          className={`min-w-[180px] justify-between ${isAccepted ? "opacity-60 cursor-not-allowed" : ""}`}
+          title={isAccepted ? "Status locked - Application accepted" : ""}
         >
           <span className="flex items-center gap-2">
             <CurrentIcon className={`h-4 w-4`} />
             <span>
               {isUpdating
                 ? "Updating..."
-                : currentStatusOption?.label || "Update Status"}
+                : isAccepted
+                  ? "Accepted"
+                  : currentStatusOption?.label || "Update Status"}
             </span>
           </span>
-          <ChevronDown className="h-4 w-4 ml-2" />
+          {!isAccepted && <ChevronDown className="h-4 w-4 ml-2" />}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[180px]">
-        {statusOptions.map((option) => {
-          const Icon = option.icon;
-          const isCurrentStatus = option.value === currentStatus.toLowerCase();
+      {!isAccepted && (
+        <DropdownMenuContent align="end" className="w-[180px]">
+          {statusOptions.map((option) => {
+            const Icon = option.icon;
+            const isCurrentStatus = option.value === currentStatus.toLowerCase();
 
-          return (
-            <DropdownMenuItem
-              key={option.value}
-              onClick={() => handleStatusChange(option.value)}
-              className={`${
-                isCurrentStatus ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              disabled={isCurrentStatus}
-            >
-              <Icon className={`h-4 w-4 mr-2 `} />
-              <span>{option.label}</span>
-              {isCurrentStatus && (
-                <Check className="h-4 w-4 ml-auto text-gray-600" />
-              )}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
+            return (
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => handleStatusChange(option.value)}
+                className={`${
+                  isCurrentStatus ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                disabled={isCurrentStatus}
+              >
+                <Icon className={`h-4 w-4 mr-2 `} />
+                <span>{option.label}</span>
+                {isCurrentStatus && (
+                  <Check className="h-4 w-4 ml-auto text-gray-600" />
+                )}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      )}
     </DropdownMenu>
   );
 }
