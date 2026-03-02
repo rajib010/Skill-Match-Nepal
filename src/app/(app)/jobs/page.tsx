@@ -163,7 +163,7 @@ export default async function JobsPage({ searchParams }: iAppProps) {
 
         {/* Job Cards */}
         <div className="mb-8">
-          <UserJobCards jobs={jobs} search={search} />
+          <UserJobCards jobs={jobs} search={search} isLoggedIn={!!userId} />
         </div>
 
         {/* Pagination */}

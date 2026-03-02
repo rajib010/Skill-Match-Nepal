@@ -16,13 +16,22 @@ import Link from "next/link";
 import { UserJobsType } from "../actions";
 import { formatDate } from "@/lib/utils";
 import { RequirementType } from "@/app/(authenticated)/dashboard/jobs/_components/job-detail-modal";
+import { IconTarget } from "@tabler/icons-react";
 
 interface iAppProps {
   jobs: UserJobsType[];
   search?: string;
+  isLoggedIn?: boolean;
 }
 
-export function UserJobCards({ jobs, search }: iAppProps) {
+function getMatchScoreColor(score: number) {
+  if (score >= 80) return "bg-green-100 text-green-800";
+  if (score >= 60) return "bg-blue-100 text-blue-800";
+  if (score >= 40) return "bg-amber-100 text-amber-800";
+  return "bg-gray-100 text-gray-600";
+}
+
+export function UserJobCards({ jobs, search, isLoggedIn }: iAppProps) {
   if (jobs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -46,10 +55,19 @@ export function UserJobCards({ jobs, search }: iAppProps) {
             className="bg-white rounded-lg p-5 hover:shadow-lg transition-all duration-200 flex flex-col"
           >
             {/* Category Badge */}
-            <div className="mb-3">
+            <div className="mb-3 flex items-center justify-between">
               <Badge variant="default" className="text-xs text-white">
                 {job.category.name}
               </Badge>
+              {isLoggedIn && job.matchScore > 0 && (
+                <Badge
+                  variant="outline"
+                  className={`text-xs font-medium flex items-center gap-1 ${getMatchScoreColor(job.matchScore)}`}
+                >
+                  <IconTarget className="w-3 h-3" />
+                  {job.matchScore}% Match
+                </Badge>
+              )}
             </div>
 
             {/* Job Title & Company */}

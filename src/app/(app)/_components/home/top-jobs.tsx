@@ -35,7 +35,7 @@ export default function TopJobs({
           </Link>
         </div>
 
-        <UserJobCards jobs={jobs} />
+        <UserJobCards jobs={jobs} isLoggedIn={isLoggedIn} />
       </div>
     </section>
   );
