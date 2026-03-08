@@ -265,13 +265,19 @@ export default function RegisterPage() {
 
           <FieldDescription className="px-6 text-center">
             By clicking continue, you agree to our{" "}
-            <a href="#" className="underline underline-offset-2">
+            <Link
+              href="/terms"
+              className="underline underline-offset-2 hover:text-primary transition-colors"
+            >
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             and{" "}
-            <a href="#" className="underline underline-offset-2">
+            <Link
+              href="/privacy"
+              className="underline underline-offset-2 hover:text-primary transition-colors"
+            >
               Privacy Policy
-            </a>
+            </Link>
             .
           </FieldDescription>
         </div>
