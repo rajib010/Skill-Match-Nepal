@@ -211,6 +211,8 @@ export async function getActiveJobs(
       message: "Jobs fetched successfully.",
       data: {
         jobs: finalJobs,
+        userHasSkills: userSkills.length > 0,
+        userSkillsCount: userSkills.length,
         currentPage: page,
         totalPages,
         totalCount,

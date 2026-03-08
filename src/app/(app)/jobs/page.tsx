@@ -91,6 +91,8 @@ export default async function JobsPage({ searchParams }: iAppProps) {
 
   const {
     jobs,
+    userHasSkills,
+    userSkillsCount,
     currentPage,
     totalPages,
     totalCount,
@@ -163,7 +165,13 @@ export default async function JobsPage({ searchParams }: iAppProps) {
 
         {/* Job Cards */}
         <div className="mb-8">
-          <UserJobCards jobs={jobs} search={search} isLoggedIn={!!userId} />
+          <UserJobCards
+            jobs={jobs}
+            search={search}
+            isLoggedIn={!!userId}
+            userHasSkills={userHasSkills}
+            userSkillsCount={userSkillsCount}
+          />
         </div>
 
         {/* Pagination */}

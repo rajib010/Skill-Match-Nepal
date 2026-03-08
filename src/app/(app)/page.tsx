@@ -61,13 +61,24 @@ export default async function Page() {
     : [];
 
   const topJobs = topJobResponse.success ? topJobResponse.data.jobs : [];
+  const userHasSkills = topJobResponse.success
+    ? topJobResponse.data.userHasSkills
+    : true;
+  const userSkillsCount = topJobResponse.success
+    ? topJobResponse.data.userSkillsCount
+    : 0;
 
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
       <Hero />
 
-      <TopJobs jobs={topJobs} isLoggedIn={isLoggedIn || false} />
+      <TopJobs
+        jobs={topJobs}
+        isLoggedIn={isLoggedIn || false}
+        userHasSkills={userHasSkills}
+        userSkillsCount={userSkillsCount}
+      />
 
       {/* Features Section */}
       <Features features={features} />

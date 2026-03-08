@@ -64,7 +64,7 @@ export default function TestimonialCollection({
               </CardHeader>
 
               <CardContent className="flex flex-col items-center gap-4 p-4 py-0">
-                <p className="text-center sm:text-xs md:text-lg font-semibold italic min-h-40 flex items-center">
+                <p className="text-center sm:text-xs md:text-base  italic min-h-40 flex items-center">
                   &quot;{item.message}&quot;
                 </p>
 

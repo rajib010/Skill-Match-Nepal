@@ -10,18 +10,22 @@ import {
   IconBuilding,
   IconCalendar,
   IconArrowRight,
+  IconTarget,
+  IconSearch,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
 import { UserJobsType } from "../actions";
 import { formatDate } from "@/lib/utils";
 import { RequirementType } from "@/app/(authenticated)/dashboard/jobs/_components/job-detail-modal";
-import { IconTarget } from "@tabler/icons-react";
+import { JobEmptyState } from "./job-empty-state";
 
 interface iAppProps {
   jobs: UserJobsType[];
   search?: string;
   isLoggedIn?: boolean;
+  userHasSkills?: boolean;
+  userSkillsCount?: number;
 }
 
 function getMatchScoreColor(score: number) {
@@ -31,18 +35,48 @@ function getMatchScoreColor(score: number) {
   return "bg-gray-100 text-gray-600";
 }
 
-export function UserJobCards({ jobs, search, isLoggedIn }: iAppProps) {
+export function UserJobCards({ 
+  jobs, 
+  search, 
+  isLoggedIn, 
+  userHasSkills = true,
+  userSkillsCount = 0 
+}: iAppProps) {
   if (jobs.length === 0) {
+    if (isLoggedIn && !userHasSkills) {
+      return (
+        <JobEmptyState
+          icon={IconTarget}
+          title="Add Your Skills"
+          description="You haven't added any skills to your profile yet. Add skills to see personalized job matches and get better recommendations."
+          actionLabel="Go to Profile"
+          actionHref="/profile"
+        />
+      );
+    }
+
+    if (isLoggedIn && userHasSkills) {
+      return (
+        <JobEmptyState
+          icon={IconSearch}
+          title="No Matching Jobs Found"
+          description={`No jobs match your current skills. You have ${userSkillsCount} skill${userSkillsCount !== 1 ? 's' : ''} in your profile. Try adding more skills or adjusting your search filters.`}
+          actionLabel="Update Profile"
+          actionHref="/profile"
+        />
+      );
+    }
+
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <IconBriefcase className="w-12 h-12 text-gray-400 mb-3" />
-        <p className="text-gray-600 text-lg font-medium">No jobs found</p>
-        {search && (
-          <p className="text-gray-400 text-sm mt-1">
-            Try adjusting your search or filters
-          </p>
-        )}
-      </div>
+      <JobEmptyState
+        icon={IconBriefcase}
+        title="No Jobs Found"
+        description={
+          search
+            ? `No jobs found for "${search}". Try adjusting your search or filters.`
+            : "No jobs are available at the moment. Check back later."
+        }
+      />
     );
   }
 
@@ -59,14 +93,36 @@ export function UserJobCards({ jobs, search, isLoggedIn }: iAppProps) {
               <Badge variant="default" className="text-xs text-white">
                 {job.category.name}
               </Badge>
-              {isLoggedIn && job.matchScore > 0 && (
-                <Badge
-                  variant="outline"
-                  className={`text-xs font-medium flex items-center gap-1 ${getMatchScoreColor(job.matchScore)}`}
-                >
-                  <IconTarget className="w-3 h-3" />
-                  {job.matchScore}% Match
-                </Badge>
+              {isLoggedIn && (
+                <>
+                  {!userHasSkills ? (
+                    <Link href="/profile">
+                      <Badge
+                        variant="outline"
+                        className="text-xs font-medium flex items-center gap-1 bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 cursor-pointer"
+                      >
+                        <IconTarget className="w-3 h-3" />
+                        Add skills to see match
+                      </Badge>
+                    </Link>
+                  ) : job.matchScore === 0 ? (
+                    <Badge
+                      variant="outline"
+                      className="text-xs font-medium flex items-center gap-1 bg-red-50 text-red-700 border-red-200"
+                    >
+                      <IconTarget className="w-3 h-3" />
+                      0% Match
+                    </Badge>
+                  ) : (
+                    <Badge
+                      variant="outline"
+                      className={`text-xs font-medium flex items-center gap-1 ${getMatchScoreColor(job.matchScore)}`}
+                    >
+                      <IconTarget className="w-3 h-3" />
+                      {job.matchScore}% Match
+                    </Badge>
+                  )}
+                </>
               )}
             </div>
 
