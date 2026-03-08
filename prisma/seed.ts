@@ -17,6 +17,8 @@ async function main() {
   await prisma.userProfile.deleteMany();
   await prisma.category.deleteMany();
   await prisma.verification.deleteMany();
+  await prisma.testimonial.deleteMany();
+  await prisma.faq.deleteMany();
   await prisma.session.deleteMany();
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
@@ -545,11 +547,78 @@ async function main() {
     },
   ];
 
-for (const faq of faqs) {
-  await prisma.faq.create({ data: faq });
-}
+  for (const faq of faqs) {
+    await prisma.faq.create({ data: faq });
+  }
+  console.log(`✅ ${faqs.length} FAQs created`);
 
-  // 7. Verify final results
+  // 8. Create testimonials
+  console.log("💬 Creating testimonials...");
+  const testimonials = [
+    {
+      name: "Rajesh Sharma",
+      address: "Kathmandu, Nepal",
+      message:
+        "Skill Match Nepal helped me find my dream job within just two weeks! The skill-based matching system is incredibly accurate and saved me hours of job searching. Highly recommend this platform to all job seekers.",
+      rating: 5,
+    },
+    {
+      name: "Sita Gurung",
+      address: "Pokhara, Nepal",
+      message:
+        "I was amazed by how well the system matched my profile with relevant job opportunities. The recommendations were spot-on based on my skills and experience. Found a perfect position as a React Developer!",
+      rating: 5,
+    },
+    {
+      name: "Anish Thapa",
+      address: "Lalitpur, Nepal",
+      message:
+        "The platform is user-friendly and makes job hunting so much easier. I appreciated being able to showcase my skills and get matched with jobs that actually fit my expertise. Great experience overall!",
+      rating: 4,
+    },
+    {
+      name: "Priya Rai",
+      address: "Bhaktapur, Nepal",
+      message:
+        "As a fresh graduate, I was struggling to find opportunities. Skill Match Nepal connected me with entry-level positions that matched my skills perfectly. Now I'm working at a great tech company!",
+      rating: 5,
+    },
+    {
+      name: "Bikash Mahato",
+      address: "Biratnagar, Nepal",
+      message:
+        "This platform is a game-changer for job seekers in Nepal. The skill matching algorithm is precise and helped me discover opportunities I wouldn't have found otherwise. Excellent service!",
+      rating: 5,
+    },
+    {
+      name: "Sarita Shrestha",
+      address: "Kathmandu, Nepal",
+      message:
+        "I was looking to switch careers and Skill Match Nepal made the transition smooth. The job recommendations were relevant to my transferable skills. Found a great role in UI/UX design!",
+      rating: 4,
+    },
+    {
+      name: "Ramesh Khadka",
+      address: "Pokhara, Nepal",
+      message:
+        "The best job platform I've used in Nepal! Adding my skills was easy, and the match scores helped me understand which jobs I was most qualified for. Landed my dream DevOps role through this.",
+      rating: 5,
+    },
+    {
+      name: "Asha Tamang",
+      address: "Butwal, Nepal",
+      message:
+        "Skill Match Nepal understands the local job market and provides relevant opportunities. I found multiple job matches for my Python skills and got hired within a month. Thank you for this amazing platform!",
+      rating: 5,
+    },
+  ];
+
+  for (const testimonial of testimonials) {
+    await prisma.testimonial.create({ data: testimonial });
+  }
+  console.log(`✅ ${testimonials.length} testimonials created`);
+
+  // 9. Verify final results
   console.log("\n🔍 Verifying results...");
   const finalUserCount = await prisma.user.count();
   const adminCount = await prisma.user.count({ where: { role: "admin" } });
@@ -562,6 +631,7 @@ for (const faq of faqs) {
   const jobRequirementCount = await prisma.jobRequirement.count();
   const applicationCount = await prisma.jobApplication.count();
   const faqsCount = await prisma.faq.count();
+  const testimonialCount = await prisma.testimonial.count();
 
   console.log("\n🎉 Database seeding completed successfully!");
   console.log("\n📋 Summary:");
@@ -574,7 +644,8 @@ for (const faq of faqs) {
   console.log(`- User Skills: ${userSkillCount}`);
   console.log(`- Job Requirements: ${jobRequirementCount}`);
   console.log(`- Job Applications: ${applicationCount}`);
-  console.log("-FaqsCount:", faqsCount);
+  console.log(`- FAQs: ${faqsCount}`);
+  console.log(`- Testimonials: ${testimonialCount}`);
 
   console.log("\n🔑 Login Credentials:");
   console.log("👑 Admin: admin@skillmatch.com / Admin@123");

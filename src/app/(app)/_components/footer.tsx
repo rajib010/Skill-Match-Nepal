@@ -48,25 +48,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* For Employers */}
-          <div>
-            <h3 className="text-white font-semibold mb-4">For Employers</h3>
-            <ul className="space-y-3 [&>*]:text-sm [&>*]:hover:text-primary [&>*]:transition-colors">
-              <li>
-                <Link href="/post-job">Post a Job</Link>
-              </li>
-              <li>
-                <Link href="/pricing">Pricing</Link>
-              </li>
-              <li>
-                <Link href="/solutions">Solutions</Link>
-              </li>
-              <li>
-                <Link href="/faq">FAQ</Link>
-              </li>
-            </ul>
-          </div>
-
           {/* Legal */}
           <div>
             <h3 className="text-white font-semibold mb-4">Legal</h3>
@@ -76,9 +57,6 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/terms">Terms of Service</Link>
-              </li>
-              <li>
-                <Link href="/cookies">Cookie Policy</Link>
               </li>
             </ul>
           </div>
