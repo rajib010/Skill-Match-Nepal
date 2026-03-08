@@ -122,6 +122,7 @@ export default function Navbar() {
             await signOut();
             toast.success("Logged out successfully.");
             setShowAlert(false);
+            router.refresh();
             router.replace("/login");
           }}
           open={showAlert}

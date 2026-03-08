@@ -116,6 +116,7 @@ export const NavUser = memo(function NavUser({ user }: { user: User }) {
         action={async () => {
           await signOut();
           setShowLogout(false);
+          router.refresh();
           router.replace("/login");
         }}
         description="You will be redirected to the login page."

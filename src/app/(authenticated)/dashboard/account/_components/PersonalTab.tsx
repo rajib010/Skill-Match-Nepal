@@ -56,7 +56,6 @@ function PersonalTab({ data }: iAppProps) {
   });
 
   if (!user) {
-    router.replace("/login");
     return null;
   }
 

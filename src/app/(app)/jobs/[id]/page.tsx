@@ -148,7 +148,7 @@ export default async function JobDetailPage({ params }: iAppProps) {
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">
                     Required Skills
                   </h2>
-                  <div className="space-y-3">
+                  <div className="space-y-3 flex flex-wrap gap-2">
                     {job.requirements.map((req: RequirementType) => (
                       <div
                         key={req.id}

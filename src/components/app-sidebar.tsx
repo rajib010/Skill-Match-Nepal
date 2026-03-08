@@ -12,6 +12,7 @@ import {
   IconBriefcase,
   IconCategory,
   IconMail,
+  IconLoader2,
 } from "@tabler/icons-react";
 import { NavMain } from "@/components/nav-main";
 import {
@@ -28,17 +29,29 @@ import Image from "next/image";
 import { Badge } from "./ui/badge";
 import { constructUrl } from "@/lib/cloudinary/utils";
 import { useUser } from "@/context/useUser";
-import { redirect } from "next/navigation";
 
 export function AppSidebar({ ...props }) {
   const { user } = useUser();
+
   if (!user) {
-    redirect("/login");
+    return (
+      <Sidebar collapsible="offcanvas" {...props}>
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <div className="flex h-[var(--header-height)] items-center justify-center">
+                <IconLoader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+      </Sidebar>
+    );
   }
 
-  const isAdmin = user && user.role === "admin";
+  const isAdmin = user.role === "admin";
 
-  const profileImage = user.image && constructUrl(user?.image);
+  const profileImage = user.image && constructUrl(user.image);
 
   const hasProfileImage = profileImage?.trim() && profileImage !== null;
 

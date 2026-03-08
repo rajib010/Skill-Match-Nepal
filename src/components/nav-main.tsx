@@ -91,6 +91,7 @@ export function NavMain({
           description="You'll be redirected to the login page and need to login to access again."
           action={async () => {
             await signOut();
+            router.refresh();
             router.push("/login");
           }}
         />
