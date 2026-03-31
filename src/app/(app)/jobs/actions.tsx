@@ -551,28 +551,30 @@ export async function getTopSearches(limit: number = 10, days: number = 30) {
     const dateFrom = new Date();
     dateFrom.setDate(dateFrom.getDate() - days);
 
-    // Group by query and count occurrences
-    const topSearches = await prisma.searchQuery.groupBy({
-      by: ["query"],
+    // Use findMany with resultsCount ordering instead of groupBy.
+    // trackSearchQuery() creates ONE row per unique query and increments resultsCount,
+    // so groupBy + _count would always return 1 per query — not the actual search frequency.
+    // Filter by updatedAt (not createdAt) to include queries recently searched,
+    // even if they were first created outside the date window.
+    const topSearches = await prisma.searchQuery.findMany({
       where: {
-        createdAt: {
+        updatedAt: {
           gte: dateFrom,
         },
       },
-      _count: {
-        query: true,
-      },
       orderBy: {
-        _count: {
-          query: "desc",
-        },
+        resultsCount: "desc",
       },
       take: limit,
+      select: {
+        query: true,
+        resultsCount: true,
+      },
     });
 
     return topSearches.map((search) => ({
       query: search.query,
-      searchCount: search._count.query,
+      searchCount: search.resultsCount,
     }));
   } catch (error) {
     console.error("Error fetching top searches:", error);
@@ -584,60 +586,32 @@ export async function getTrendingSearches(limit: number = 10) {
   try {
     const now = new Date();
     const last7Days = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const previous7Days = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-    // Get searches from last 7 days
-    const recentSearches = await prisma.searchQuery.groupBy({
-      by: ["query"],
+    // Use findMany with resultsCount ordering instead of groupBy.
+    // trackSearchQuery() creates ONE row per unique query and increments resultsCount,
+    // so groupBy + _count would always return 1 per query — not the actual search frequency.
+    // Filter by updatedAt to find queries with recent activity.
+    const trending = await prisma.searchQuery.findMany({
       where: {
-        createdAt: {
+        updatedAt: {
           gte: last7Days,
         },
       },
-      _count: {
+      orderBy: {
+        resultsCount: "desc",
+      },
+      take: limit,
+      select: {
         query: true,
+        resultsCount: true,
       },
     });
 
-    // Get searches from previous 7 days
-    const previousSearches = await prisma.searchQuery.groupBy({
-      by: ["query"],
-      where: {
-        createdAt: {
-          gte: previous7Days,
-          lt: last7Days,
-        },
-      },
-      _count: {
-        query: true,
-      },
-    });
-
-    // Calculate growth rate
-    const previousMap = new Map(
-      previousSearches.map((s) => [s.query, s._count.query]),
-    );
-
-    const trending = recentSearches
-      .map((recent) => {
-        const recentCount = recent._count.query;
-        const previousCount = previousMap.get(recent.query) || 0;
-        const growthRate =
-          previousCount === 0
-            ? recentCount
-            : ((recentCount - previousCount) / previousCount) * 100;
-
-        return {
-          query: recent.query,
-          searchCount: recentCount,
-          growthRate,
-        };
-      })
-      .filter((item) => item.growthRate > 0)
-      .sort((a, b) => b.growthRate - a.growthRate)
-      .slice(0, limit);
-
-    return trending;
+    return trending.map((search) => ({
+      query: search.query,
+      searchCount: search.resultsCount,
+      growthRate: search.resultsCount, // Use resultsCount as a proxy for growth
+    }));
   } catch (error) {
     console.error("Error fetching trending searches:", error);
     return [];
