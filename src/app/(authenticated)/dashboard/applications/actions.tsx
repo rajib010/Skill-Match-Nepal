@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { sendMail } from "@/lib/mailer";
 import ApplicationAccepted from "@/mail/application-accepted";
+import ApplicationRejected from "@/mail/application-rejected";
 import { APP_URL } from "@/config";
 
 export async function getAllApplications(
@@ -303,6 +304,28 @@ export async function updateApplicationStatus(
         });
       } catch (emailError) {
         console.error("Failed to send acceptance email:", emailError);
+      }
+    }
+
+    if (status === "rejected") {
+      try {
+        const applicationUrl = `${APP_URL}/jobs`;
+
+        await sendMail({
+          to: application.user.email,
+          subject: `Update on your application for ${application.job.title}`,
+          content: {
+            template: ApplicationRejected,
+            props: {
+              userName: application.user.name,
+              jobTitle: application.job.title,
+              company: application.job.company,
+              applicationUrl,
+            },
+          },
+        });
+      } catch (emailError) {
+        console.error("Failed to send rejection email:", emailError);
       }
     }
 
