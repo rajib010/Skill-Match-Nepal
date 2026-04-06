@@ -29,6 +29,7 @@ import {
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { constructUrl } from "@/lib/cloudinary/utils";
+import { uploadFileFunction, deleteFileFunction } from "@/lib/cloudinary/action";
 import { useUser } from "@/context/useUser";
 
 interface iAppProps {
@@ -103,41 +104,40 @@ function PersonalTab({ data }: iAppProps) {
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
 
-      // presigned URL
-      const presignedResponse = await fetch("/api/s3/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          size: file.size,
-          isImage: true,
-          uploadFolder: "users",
-        }),
-      });
+      // Upload to Cloudinary via server action
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("fileType", "image");
+      formData.append("folder", "users");
 
-      if (!presignedResponse.ok) {
-        throw new Error("Failed to get presigned URL");
+      const response = await uploadFileFunction(formData);
+
+      // Handle error response
+      if (
+        !response ||
+        (typeof response === "object" &&
+          "status" in response &&
+          response.status === "error")
+      ) {
+        const errorMessage =
+          response && typeof response === "object" && "message" in response
+            ? (response as { message: string }).message
+            : "Failed to upload image";
+        toast.error(errorMessage);
+        setPreviewImage(data.image ? constructUrl(data.image) : null);
+        return;
       }
 
-      const { presignedUrl, key } = await presignedResponse.json();
-
-      // Upload to S3
-      const uploadResponse = await fetch(presignedUrl, {
-        method: "PUT",
-        headers: {
-          "Content-Type": file.type,
-        },
-        body: file,
-      });
-
-      if (!uploadResponse.ok) {
-        throw new Error("Failed to upload image");
+      if ("url" in response && "publicId" in response) {
+        const { url, publicId } = response;
+        // Store the Cloudinary publicId in the form
+        setValue("image", publicId, { shouldDirty: true });
+        setPreviewImage(url);
+        toast.success("Image uploaded successfully");
+      } else {
+        toast.error("Invalid response from upload service");
+        setPreviewImage(data.image ? constructUrl(data.image) : null);
       }
-
-      // Update form value with the S3 key
-      setValue("image", key, { shouldDirty: true });
-      toast.success("Image uploaded successfully");
     } catch {
       toast.error("Failed to upload image");
       setPreviewImage(data.image ? constructUrl(data.image) : null);
@@ -152,20 +152,22 @@ function PersonalTab({ data }: iAppProps) {
     try {
       setIsUploading(true);
 
-      const response = await fetch("/api/s3/delete", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          key: currentImage,
-        }),
-      });
+      const response = await deleteFileFunction(currentImage);
 
-      if (!response.ok) {
-        throw new Error("Failed to delete image");
+      // Handle failed case
+      if (
+        !response ||
+        (typeof response === "object" &&
+          "status" in response &&
+          response.status === "error")
+      ) {
+        toast.error("Failed to remove image from storage");
+        return;
       }
 
       setValue("image", "", { shouldDirty: true });
       setPreviewImage(null);
+      toast.success("Image removed successfully");
     } catch {
       toast.error("Failed to remove profile image.");
     } finally {

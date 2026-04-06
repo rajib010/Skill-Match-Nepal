@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { UserProvider } from "@/context/useUser";
 import { getSignedInUser } from "@/lib/auth/server";
+import ScrollToTop from "@/components/scroll-to-top";
 
 export const metadata: Metadata = {
   title: "Skill Match Nepal",
@@ -20,6 +21,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <ScrollToTop />
         <Toaster />
         <UserProvider user={user}>{children}</UserProvider>
       </body>
