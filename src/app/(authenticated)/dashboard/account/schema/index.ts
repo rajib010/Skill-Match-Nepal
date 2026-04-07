@@ -1,27 +1,28 @@
 import z from "zod";
+import {
+  PASSWORD_REGEX,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_ERROR_MSG,
+} from "@/lib/validation/password";
+import { PHONE_REGEX, PHONE_ERROR_MSG } from "@/lib/validation/phone";
 
 export const changePasswordSchema = z
   .object({
     id: z.string().optional(),
     oldPassword: z
       .string()
-      .trim()
       .min(1, "Old Password is required.")
-      .max(100, "Max. 100 characters allowed."),
+      .max(PASSWORD_MAX_LENGTH, `Max. ${PASSWORD_MAX_LENGTH} characters allowed.`),
     newPassword: z
       .string()
-      .trim()
-      .min(1, "New password is required.")
-      .regex(
-        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).+$/,
-        "Password must contain letters, numbers, and special characters."
-      )
-      .max(100, "Max. 100 characters allowed."),
+      .min(PASSWORD_MIN_LENGTH, "Password must be at least 8 characters.")
+      .regex(PASSWORD_REGEX, PASSWORD_ERROR_MSG)
+      .max(PASSWORD_MAX_LENGTH, `Max. ${PASSWORD_MAX_LENGTH} characters allowed.`),
     confirmPassword: z
       .string()
-      .trim()
       .min(1, "Confirm password is required.")
-      .max(100, "Max. 100 characters allowed."),
+      .max(PASSWORD_MAX_LENGTH, `Max. ${PASSWORD_MAX_LENGTH} characters allowed.`),
   })
   .superRefine(({ newPassword, confirmPassword }, ctx) => {
     if (newPassword !== confirmPassword) {
@@ -47,10 +48,9 @@ export const updateUserSchema = z.object({
   contactPhone: z
     .string()
     .trim()
-    .refine(
-      (val) => /^\d{10}$/.test(val),
-      "Contact number must be exactly 10 digits."
-    ),
+    .regex(PHONE_REGEX, PHONE_ERROR_MSG)
+    .optional()
+    .or(z.literal("")),
 });
 
 export type ChangePasswordSchemaType = z.infer<typeof changePasswordSchema>;

@@ -34,6 +34,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
   updateProfile,
   addSkill,
   deleteSkill,
@@ -43,6 +53,13 @@ import { useRouter } from "next/navigation";
 import { changePassword } from "@/lib/auth/client";
 import DialogWrapper from "@/app/(authenticated)/dashboard/_components/dialog-wrapper";
 import { DialogFooter } from "@/components/ui/dialog";
+import {
+  profileSchema,
+  ProfileSchemaType,
+  skillSchema,
+  changeProfilePasswordSchema,
+  ChangeProfilePasswordSchemaType,
+} from "../schema";
 
 type UserData = {
   id: string;
@@ -66,6 +83,15 @@ type UserData = {
   } | null;
 };
 
+const getProfileDefaultValues = (user: UserData): ProfileSchemaType => ({
+  name: user.name,
+  phone: user.profile?.phone || "",
+  location: user.profile?.location || "",
+  bio: user.profile?.bio || "",
+  experience: user.profile?.experience || "",
+  education: user.profile?.education || "",
+});
+
 export default function ProfileClient({ user }: { user: UserData }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -77,13 +103,18 @@ export default function ProfileClient({ user }: { user: UserData }) {
   } | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const [formData, setFormData] = useState({
-    name: user.name,
-    phone: user.profile?.phone || "",
-    location: user.profile?.location || "",
-    bio: user.profile?.bio || "",
-    experience: user.profile?.experience || "",
-    education: user.profile?.education || "",
+  const profileForm = useForm<ProfileSchemaType>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: getProfileDefaultValues(user),
+  });
+
+  const passwordForm = useForm<ChangeProfilePasswordSchemaType>({
+    resolver: zodResolver(changeProfilePasswordSchema),
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
   });
 
   const [newSkill, setNewSkill] = useState({
@@ -91,29 +122,28 @@ export default function ProfileClient({ user }: { user: UserData }) {
     level: "intermediate",
   });
   const [deletePassword, setDeletePassword] = useState("");
-  const [passwordData, setPasswordData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
+
+  const { isDirty: isProfileDirty } = profileForm.formState;
+  const { isDirty: isPasswordDirty } = passwordForm.formState;
 
   const showMessage = (type: "success" | "error", text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
   };
 
-  const handleUpdateProfile = async () => {
+  const handleUpdateProfile = async (values: ProfileSchemaType) => {
     setLoading(true);
     try {
-      const result = await updateProfile(formData);
+      const result = await updateProfile(values);
       if (result.success) {
         showMessage("success", "Profile updated successfully!");
+        profileForm.reset(values);
         setEditing(false);
         router.refresh();
       } else {
         showMessage("error", result.message || "Failed to update profile");
       }
-    } catch (error) {
+    } catch {
       showMessage("error", "An error occurred");
     } finally {
       setLoading(false);
@@ -121,19 +151,24 @@ export default function ProfileClient({ user }: { user: UserData }) {
   };
 
   const handleAddSkill = async () => {
-    if (!newSkill.skillName.trim()) return;
+    const result = skillSchema.safeParse(newSkill);
+    if (!result.success) {
+      const firstError = result.error.issues[0];
+      showMessage("error", firstError?.message || "Invalid skill data");
+      return;
+    }
 
     setLoading(true);
     try {
-      const result = await addSkill(newSkill.skillName, newSkill.level);
-      if (result.success) {
+      const res = await addSkill(result.data.skillName, result.data.level);
+      if (res.success) {
         showMessage("success", "Skill added successfully!");
         setNewSkill({ skillName: "", level: "intermediate" });
         router.refresh();
       } else {
-        showMessage("error", result.message || "Failed to add skill");
+        showMessage("error", res.message || "Failed to add skill");
       }
-    } catch (error) {
+    } catch {
       showMessage("error", "An error occurred");
     } finally {
       setLoading(false);
@@ -150,44 +185,35 @@ export default function ProfileClient({ user }: { user: UserData }) {
       } else {
         showMessage("error", result.message || "Failed to remove skill");
       }
-    } catch (error) {
+    } catch {
       showMessage("error", "An error occurred");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleChangePassword = async () => {
-    // if (passwordData.newPassword !== passwordData.confirmPassword) {
-    //   showMessage("error", "Passwords do not match");
-    //   return;
-    // }
-    // if (passwordData.newPassword.length < 8) {
-    //   showMessage("error", "Password must be at least 8 characters");
-    //   return;
-    // }
-    // setLoading(true);
-    // try {
-    //   const result = await changePassword(
-    //     passwordData.currentPassword,
-    //     passwordData.newPassword
-    //   );
-    //   if (result.success) {
-    //     showMessage("success", "Password changed successfully!");
-    //     setShowPasswordModal(false);
-    //     setPasswordData({
-    //       currentPassword: "",
-    //       newPassword: "",
-    //       confirmPassword: "",
-    //     });
-    //   } else {
-    //     showMessage("error", result.error || "Failed to change password");
-    //   }
-    // } catch (error) {
-    //   showMessage("error", "An error occurred");
-    // } finally {
-    //   setLoading(false);
-    // }
+  const handleChangePassword = async (values: ChangeProfilePasswordSchemaType) => {
+    setLoading(true);
+    try {
+      const result = await changePassword({
+        newPassword: values.newPassword,
+        currentPassword: values.currentPassword,
+        revokeOtherSessions: true,
+      });
+
+      if (result.error) {
+        showMessage("error", result.error.message || "Failed to change password");
+        return;
+      }
+
+      showMessage("success", "Password changed successfully!");
+      setShowPasswordModal(false);
+      passwordForm.reset();
+    } catch {
+      showMessage("error", "An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
@@ -207,11 +233,16 @@ export default function ProfileClient({ user }: { user: UserData }) {
       } else {
         showMessage("error", result.message || "Failed to delete account");
       }
-    } catch (error) {
+    } catch {
       showMessage("error", "An error occurred");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditing(false);
+    profileForm.reset(getProfileDefaultValues(user));
   };
 
   const skills = user.profile?.skills || [];
@@ -258,17 +289,7 @@ export default function ProfileClient({ user }: { user: UserData }) {
                 ) : (
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      setEditing(false);
-                      setFormData({
-                        name: user.name,
-                        phone: user.profile?.phone || "",
-                        location: user.profile?.location || "",
-                        bio: user.profile?.bio || "",
-                        experience: user.profile?.experience || "",
-                        education: user.profile?.education || "",
-                      });
-                    }}
+                    onClick={handleCancelEdit}
                   >
                     Cancel
                   </Button>
@@ -302,111 +323,154 @@ export default function ProfileClient({ user }: { user: UserData }) {
             <CardTitle>Profile Information</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  <User className="h-4 w-4 inline mr-1" />
-                  Full Name
-                </Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
-                  disabled={!editing}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">
-                  <Phone className="h-4 w-4 inline mr-1" />
-                  Phone Number
-                </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
-                  }
-                  disabled={!editing}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="location">
-                <MapPin className="h-4 w-4 inline mr-1" />
-                Location
-              </Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) =>
-                  setFormData({ ...formData, location: e.target.value })
-                }
-                disabled={!editing}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="bio">
-                <FileText className="h-4 w-4 inline mr-1" />
-                Bio
-              </Label>
-              <Textarea
-                id="bio"
-                value={formData.bio}
-                onChange={(e) =>
-                  setFormData({ ...formData, bio: e.target.value })
-                }
-                disabled={!editing}
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="experience">
-                <Briefcase className="h-4 w-4 inline mr-1" />
-                Experience
-              </Label>
-              <Textarea
-                id="experience"
-                value={formData.experience}
-                onChange={(e) =>
-                  setFormData({ ...formData, experience: e.target.value })
-                }
-                disabled={!editing}
-                rows={4}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="education">
-                <GraduationCap className="h-4 w-4 inline mr-1" />
-                Education
-              </Label>
-              <Textarea
-                id="education"
-                value={formData.education}
-                onChange={(e) =>
-                  setFormData({ ...formData, education: e.target.value })
-                }
-                disabled={!editing}
-                rows={3}
-              />
-            </div>
-
-            {editing && (
-              <Button
-                onClick={handleUpdateProfile}
-                disabled={loading}
-                className="w-full"
+            <Form {...profileForm}>
+              <form
+                onSubmit={profileForm.handleSubmit(handleUpdateProfile)}
+                className="space-y-4"
               >
-                {loading ? "Saving..." : "Save Changes"}
-              </Button>
-            )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={profileForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <User className="h-4 w-4 inline mr-1" />
+                          Full Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            disabled={!editing}
+                            placeholder="Your full name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={profileForm.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          <Phone className="h-4 w-4 inline mr-1" />
+                          Phone Number
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="tel"
+                            disabled={!editing}
+                            placeholder="Your phone number"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={profileForm.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <MapPin className="h-4 w-4 inline mr-1" />
+                        Location
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          disabled={!editing}
+                          placeholder="Your location"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={profileForm.control}
+                  name="bio"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <FileText className="h-4 w-4 inline mr-1" />
+                        Bio
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          disabled={!editing}
+                          rows={3}
+                          placeholder="Tell us about yourself"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={profileForm.control}
+                  name="experience"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <Briefcase className="h-4 w-4 inline mr-1" />
+                        Experience
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          disabled={!editing}
+                          rows={4}
+                          placeholder="Your work experience"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={profileForm.control}
+                  name="education"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <GraduationCap className="h-4 w-4 inline mr-1" />
+                        Education
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          disabled={!editing}
+                          rows={3}
+                          placeholder="Your education background"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {editing && (
+                  <Button
+                    type="submit"
+                    disabled={loading || !isProfileDirty}
+                    className="w-full"
+                  >
+                    {loading ? "Saving..." : "Save Changes"}
+                  </Button>
+                )}
+              </form>
+            </Form>
           </CardContent>
         </Card>
 
@@ -445,6 +509,12 @@ export default function ProfileClient({ user }: { user: UserData }) {
                     setNewSkill({ ...newSkill, skillName: e.target.value })
                   }
                   className="flex-1"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddSkill();
+                    }
+                  }}
                 />
                 <Select
                   value={newSkill.level}
@@ -476,61 +546,86 @@ export default function ProfileClient({ user }: { user: UserData }) {
           noAutoClose={true}
           title="Change Password"
         >
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
-              <Input
-                id="currentPassword"
-                type="password"
-                value={passwordData.currentPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    currentPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                value={passwordData.newPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    newPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={passwordData.confirmPassword}
-                onChange={(e) =>
-                  setPasswordData({
-                    ...passwordData,
-                    confirmPassword: e.target.value,
-                  })
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setShowPasswordModal(false)}
+          <Form {...passwordForm}>
+            <form
+              onSubmit={passwordForm.handleSubmit(handleChangePassword)}
+              className="space-y-4 py-4"
             >
-              Cancel
-            </Button>
-            <Button onClick={handleChangePassword} disabled={loading}>
-              {loading ? "Changing..." : "Change Password"}
-            </Button>
-          </DialogFooter>
+              <FormField
+                control={passwordForm.control}
+                name="currentPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="currentPassword">
+                      Current Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="currentPassword"
+                        type="password"
+                        placeholder="Enter current password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="newPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="newPassword">New Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="newPassword"
+                        type="password"
+                        placeholder="Enter new password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={passwordForm.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="confirmPassword">
+                      Confirm New Password
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        id="confirmPassword"
+                        type="password"
+                        placeholder="Confirm new password"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={loading || !isPasswordDirty}
+                >
+                  {loading ? "Changing..." : "Change Password"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogWrapper>
 
         {/* Delete Account Modal */}

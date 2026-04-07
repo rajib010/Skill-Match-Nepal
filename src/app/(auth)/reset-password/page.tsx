@@ -7,6 +7,12 @@ import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import logo from "../../../../public/logo.jpg"
+import {
+    PASSWORD_REGEX,
+    PASSWORD_MIN_LENGTH,
+    PASSWORD_LENGTH_MSG,
+    PASSWORD_ERROR_MSG,
+} from "@/lib/validation/password"
 
 
 export default function ResetPasswordPage() {
@@ -48,7 +54,22 @@ export default function ResetPasswordPage() {
 
                 const form = new FormData(e.target as HTMLFormElement)
 
-                if (form.get('password') !== form.get('confirm-password')) {
+                const password = form.get('password') as string;
+                const confirmPassword = form.get('confirm-password') as string;
+
+                if (password.length < PASSWORD_MIN_LENGTH) {
+                    setError(PASSWORD_LENGTH_MSG)
+                    setLoading(false)
+                    return;
+                }
+
+                if (!PASSWORD_REGEX.test(password)) {
+                    setError(PASSWORD_ERROR_MSG)
+                    setLoading(false)
+                    return;
+                }
+
+                if (password !== confirmPassword) {
                     setError("Passwords do not match")
                     setLoading(false)
                     return;

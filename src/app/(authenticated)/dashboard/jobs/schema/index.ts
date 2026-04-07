@@ -2,11 +2,27 @@ import z from "zod";
 
 export const jobSchema = z.object({
   id: z.string().optional(),
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  company: z.string().min(2, "Company name is required"),
-  location: z.string().min(2, "Location is required"),
-  salary: z.string().optional(),
+  title: z
+    .string()
+    .min(3, "Title must be at least 3 characters")
+    .max(100, "Title must be less than 100 characters"),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .max(5000, "Description must be less than 5000 characters"),
+  company: z
+    .string()
+    .min(2, "Company name is required")
+    .max(100, "Company name must be less than 100 characters"),
+  location: z
+    .string()
+    .min(2, "Location is required")
+    .max(100, "Location must be less than 100 characters"),
+  salary: z
+    .string()
+    .max(50, "Salary must be less than 50 characters")
+    .optional()
+    .or(z.literal("")),
   jobType: z.string().min(1, "Please select the job type."),
   isActive: z.boolean(),
   categoryId: z
@@ -17,7 +33,10 @@ export const jobSchema = z.object({
   requirements: z
     .array(
       z.object({
-        skillName: z.string().min(1, "Skill name is required."),
+        skillName: z
+          .string()
+          .min(1, "Skill name is required.")
+          .max(50, "Skill name must be less than 50 characters."),
         required: z.boolean(),
       })
     )

@@ -7,19 +7,19 @@ export const testimonialSchema = z.object({
     .trim()
     .min(1, "Name is required")
     .min(3, "Name must be at least 3 characters")
-    .max(100, "Name must be less than 25 characters"),
+    .max(100, "Name must be less than 100 characters"),
   address: z
     .string()
     .trim()
     .min(1, "Address is required")
     .min(3, "Address must be at least 3 characters")
-    .max(100, "Address must be less than 25 characters"),
+    .max(100, "Address must be less than 100 characters"),
   message: z
     .string()
     .trim()
     .min(1, "Message is required")
     .min(10, "Message must be at least 10 characters")
-    .max(150, "Message must be less than 170 characters"),
+    .max(150, "Message must be less than 150 characters"),
   rating: z
     .string()
     .trim()

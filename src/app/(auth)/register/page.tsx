@@ -6,6 +6,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import {
+  PASSWORD_REGEX,
+  PASSWORD_MIN_LENGTH,
+  PASSWORD_LENGTH_MSG,
+  PASSWORD_ERROR_MSG,
+} from "@/lib/validation/password";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -36,8 +42,35 @@ export default function RegisterPage() {
 
     const form = new FormData(e.currentTarget);
 
+    const name = (form.get("name") as string).trim();
+    const email = (form.get("email") as string).trim();
     const password = form.get("password") as string;
     const confirmPassword = form.get("confirm-password") as string;
+
+    if (name.length < 3) {
+      setError("Name must be at least 3 characters.");
+      setLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (password.length < PASSWORD_MIN_LENGTH) {
+      setError(PASSWORD_LENGTH_MSG);
+      setLoading(false);
+      return;
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      setError(PASSWORD_ERROR_MSG);
+      setLoading(false);
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -46,8 +79,8 @@ export default function RegisterPage() {
     }
 
     const { error } = await signUp({
-      name: form.get("name") as string,
-      email: form.get("email") as string,
+      name,
+      email,
       password,
       callbackURL: "/login?from=verification-email",
     });

@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { getSignedInUser } from "@/lib/auth/server";
 import { prisma } from "@/database/prisma";
+import { profileSchema, skillSchema, ProfileSchemaType, SkillSchemaType } from "./schema";
 
 export async function getUserDetail(id: string): Promise<ApiResponse> {
   try {
@@ -52,14 +53,9 @@ export async function getUserDetail(id: string): Promise<ApiResponse> {
 }
 
 // Update user profile
-export async function updateProfile(data: {
-  name: string;
-  phone: string;
-  location: string;
-  bio: string;
-  experience: string;
-  education: string;
-}): Promise<ApiResponse> {
+export async function updateProfile(
+  data: ProfileSchemaType
+): Promise<ApiResponse> {
   try {
     const session = await getSignedInUser();
 
@@ -67,7 +63,18 @@ export async function updateProfile(data: {
       return { success: false, message: "Unauthorized" };
     }
 
-    const { name, phone, location, bio, experience, education } = data;
+    // Server-side validation
+    const validation = profileSchema.safeParse(data);
+
+    if (!validation.success) {
+      return {
+        success: false,
+        message: validation.error.issues[0]?.message || "Invalid data provided.",
+      };
+    }
+
+    const { name, phone, location, bio, experience, education } =
+      validation.data;
 
     // Update user name
     await prisma.user.update({
@@ -97,7 +104,7 @@ export async function updateProfile(data: {
     });
 
     revalidatePath("/profile");
-    return { success: true, message: "Logged in successfull." };
+    return { success: true, message: "Profile updated successfully." };
   } catch (error) {
     console.error("Error updating profile:", error);
     return { success: false, message: "Failed to update profile" };
@@ -107,7 +114,7 @@ export async function updateProfile(data: {
 // Add skill to user profile
 export async function addSkill(
   skillName: string,
-  level: string
+  level: SkillSchemaType["level"]
 ): Promise<ApiResponse> {
   try {
     const session = await getSignedInUser();
@@ -116,8 +123,14 @@ export async function addSkill(
       return { success: false, message: "Unauthorized" };
     }
 
-    if (!skillName.trim()) {
-      return { success: false, message: "Skill name is required" };
+    // Server-side validation
+    const validation = skillSchema.safeParse({ skillName, level });
+
+    if (!validation.success) {
+      return {
+        success: false,
+        message: validation.error.issues[0]?.message || "Invalid skill data.",
+      };
     }
 
     // Get or create user profile
@@ -131,8 +144,8 @@ export async function addSkill(
     await prisma.userSkill.create({
       data: {
         profileId: profile.id,
-        skillName: skillName.trim(),
-        level: level || "intermediate",
+        skillName: validation.data.skillName,
+        level: validation.data.level,
       },
     });
 
