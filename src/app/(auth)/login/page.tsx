@@ -66,8 +66,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.refresh();
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   async function handleGoogleSignIn() {

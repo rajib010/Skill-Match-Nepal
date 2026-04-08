@@ -1,7 +1,3 @@
-/**
- * Shared password validation constants.
- * Used across register, reset-password, profile, and admin account flows.
- */
 
 export const PASSWORD_REGEX =
   /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/;

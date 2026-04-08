@@ -1,7 +1,3 @@
-/**
- * Shared phone validation constants.
- * Used across profile and admin account flows.
- */
 
 export const PHONE_REGEX = /^$|^\+?[\d\s\-()]{7,20}$/;
 
