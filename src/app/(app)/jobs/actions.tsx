@@ -419,12 +419,15 @@ export async function applyForJob(
 
 export async function getCategories(): Promise<ApiResponse> {
   try {
+    const activeJobFilter = {
+      isActive: true,
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    };
+
     const categories = await prisma.category.findMany({
       where: {
         jobs: {
-          some: {
-            isActive: true, //categories with at least one job
-          },
+          some: activeJobFilter, // categories with at least one active, non-expired job
         },
       },
       orderBy: {
@@ -434,9 +437,7 @@ export async function getCategories(): Promise<ApiResponse> {
         _count: {
           select: {
             jobs: {
-              where: {
-                isActive: true,
-              },
+              where: activeJobFilter,
             },
           },
         },
