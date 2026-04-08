@@ -3,7 +3,10 @@
 import { prisma } from "@/database/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { isSkillMatch } from "./algorithm";
+import { bestSkillMatchScore } from "./algorithm";
+
+/** Minimum match quality (0.0–1.0) to count a skill as "matched". */
+const MATCH_THRESHOLD = 0.5;
 
 export async function getActiveJobs(
   page: number = 1,
@@ -143,20 +146,16 @@ export async function getActiveJobs(
 
         // Check required skills with Levenshtein fuzzy matching
         requiredSkills.forEach((req) => {
-          const hasMatch = userSkills.some(
-            (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
-          );
-          if (hasMatch) {
+          const bestScore = bestSkillMatchScore(userSkills, req.skillName, 2);
+          if (bestScore >= MATCH_THRESHOLD) {
             matchedRequired++;
           }
         });
 
         // Check preferred skills with Levenshtein fuzzy matching
         preferredSkills.forEach((req) => {
-          const hasMatch = userSkills.some(
-            (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
-          );
-          if (hasMatch) {
+          const bestScore = bestSkillMatchScore(userSkills, req.skillName, 2);
+          if (bestScore >= MATCH_THRESHOLD) {
             matchedPreferred++;
           }
         });
@@ -351,20 +350,16 @@ export async function applyForJob(
 
       // Check required skills with Levenshtein fuzzy matching
       requiredSkills.forEach((req) => {
-        const hasMatch = userSkills.some(
-          (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
-        );
-        if (hasMatch) {
+        const bestScore = bestSkillMatchScore(userSkills, req.skillName, 2);
+        if (bestScore >= MATCH_THRESHOLD) {
           matchedRequired++;
         }
       });
 
       // Check preferred skills with Levenshtein fuzzy matching
       preferredSkills.forEach((req) => {
-        const hasMatch = userSkills.some(
-          (userSkill) => isSkillMatch(userSkill, req.skillName, 2), // threshold = 2
-        );
-        if (hasMatch) {
+        const bestScore = bestSkillMatchScore(userSkills, req.skillName, 2);
+        if (bestScore >= MATCH_THRESHOLD) {
           matchedPreferred++;
         }
       });
