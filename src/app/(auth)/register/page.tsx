@@ -47,8 +47,10 @@ export default function RegisterPage() {
     const password = form.get("password") as string;
     const confirmPassword = form.get("confirm-password") as string;
 
-    if (name.length < 3) {
-      setError("Name must be at least 3 characters.");
+    const nameRegex = /^[A-Za-z]{3,}$/;
+
+    if (!nameRegex.test(name)) {
+      setError("Name must contain only letters and be at least 3 characters.");
       setLoading(false);
       return;
     }
